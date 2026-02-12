@@ -2,6 +2,7 @@ package com.academic.TranscriptSystem.service.impl;
 
 import com.academic.TranscriptSystem.entity.Transcript;
 import com.academic.TranscriptSystem.repository.TranscriptRepository;
+import com.academic.TranscriptSystem.security.HashUtil;
 import com.academic.TranscriptSystem.service.TranscriptService;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,14 @@ public class TranscriptServiceImpl implements TranscriptService {
 
     @Override
     public Transcript issueTranscript(Transcript transcript) {
+        String dataToHash = transcript.getStudentId() +
+                transcript.getStudentEmail() +
+                transcript.getSemester() +
+                transcript.getCgpa();
+
+        String hash = HashUtil.generateHash(dataToHash);
+
+        transcript.setBlockchainHash(hash);
         return transcriptRepository.save(transcript);
     }
 
