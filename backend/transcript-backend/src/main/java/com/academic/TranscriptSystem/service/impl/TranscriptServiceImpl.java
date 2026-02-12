@@ -79,12 +79,14 @@ public class TranscriptServiceImpl implements TranscriptService {
 
         String blockchainHash =
                 blockchainService.getHashFromBlockchain(transcript.getBlockchainTxId());
-
+        System.out.println("Stored: " + blockchainHash);
+        System.out.println("New: " + recalculatedHash);
         if (recalculatedHash.equals(blockchainHash)) {
             return new VerificationResponseDTO(true, "Transcript VERIFIED");
         } else {
             return new VerificationResponseDTO(false, "Transcript TAMPERED");
         }
+
     }
 
 }
