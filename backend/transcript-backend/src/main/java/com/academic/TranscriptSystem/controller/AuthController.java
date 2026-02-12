@@ -5,10 +5,14 @@ import com.academic.TranscriptSystem.entity.Admin;
 import com.academic.TranscriptSystem.repository.AdminRepository;
 import com.academic.TranscriptSystem.response.ApiResponse;
 
+import com.academic.TranscriptSystem.entity.Student;
+import com.academic.TranscriptSystem.repository.StudentRepository;
+
 import jakarta.validation.Valid;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import com.academic.TranscriptSystem.security.JwtUtil;
+
 
 
 @RestController
@@ -16,16 +20,20 @@ import com.academic.TranscriptSystem.security.JwtUtil;
 public class AuthController {
 
     private final AdminRepository adminRepository;
+    private final StudentRepository studentRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
 
     public AuthController(AdminRepository adminRepository,
                           PasswordEncoder passwordEncoder,
-                          JwtUtil jwtUtil) {
+                          JwtUtil jwtUtil,
+                          StudentRepository studentRepository) {
+
         this.adminRepository = adminRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
+        this.studentRepository = studentRepository;
     }
 
     @PostMapping("/login")
@@ -49,4 +57,29 @@ public class AuthController {
         String token = jwtUtil.generateToken(admin.getUsername(), "ADMIN");
         return new ApiResponse<>(true, "Login successful", token);
     }
+
+    @PostMapping("/student/login")
+    public ApiResponse<String> studentLogin(@Valid @RequestBody LoginRequestDTO request) {
+
+        Student student = studentRepository.findByEmail(request.getUsername())
+                .orElse(null);
+
+        if (student == null) {
+            return new ApiResponse<>(false, "Student not found", null);
+        }
+
+        boolean passwordMatches = passwordEncoder.matches(
+                request.getPassword(),
+                student.getPassword()
+        );
+
+        if (!passwordMatches) {
+            return new ApiResponse<>(false, "Invalid password", null);
+        }
+
+        String token = jwtUtil.generateToken(student.getEmail(), "STUDENT");
+
+        return new ApiResponse<>(true, "Student login successful", token);
+    }
+
 }
