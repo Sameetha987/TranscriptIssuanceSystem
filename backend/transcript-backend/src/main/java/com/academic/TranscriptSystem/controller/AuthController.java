@@ -46,8 +46,7 @@ public class AuthController {
         if (!passwordMatches) {
             return new ApiResponse<>(false, "Invalid password", null);
         }
-        String token = jwtUtil.generateToken(admin.getUsername());
-
+        String token = jwtUtil.generateToken(admin.getUsername(), "ADMIN");
         return new ApiResponse<>(true, "Login successful", token);
     }
 }

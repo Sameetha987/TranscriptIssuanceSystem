@@ -17,15 +17,18 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()   // login allowed
-                        .anyRequest().authenticated()                  // everything else secured
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/transcripts/issue").hasRole("ADMIN")
+                        .requestMatchers("/api/transcripts/student/**").hasAnyRole("ADMIN","STUDENT")
+                        .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
