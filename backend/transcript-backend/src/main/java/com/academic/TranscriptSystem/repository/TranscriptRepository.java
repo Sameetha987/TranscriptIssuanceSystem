@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface TranscriptRepository extends JpaRepository<Transcript, Long> {
     List<Transcript> findByStudentId(Long studentId);
+
+    List<Transcript> findByStudentEmail(String email);
 }

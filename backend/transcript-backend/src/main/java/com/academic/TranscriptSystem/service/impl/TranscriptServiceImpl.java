@@ -30,4 +30,10 @@ public class TranscriptServiceImpl implements TranscriptService {
     public Transcript getTranscriptById(Long transcriptId) {
         return transcriptRepository.findById(transcriptId).orElse(null);
     }
+
+    @Override
+    public List<Transcript> getTranscriptsByStudentEmail(String email) {
+        return transcriptRepository.findByStudentEmail(email);
+    }
+
 }

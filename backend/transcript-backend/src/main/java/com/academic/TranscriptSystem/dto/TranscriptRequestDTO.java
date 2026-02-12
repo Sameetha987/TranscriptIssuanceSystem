@@ -8,6 +8,9 @@ public class TranscriptRequestDTO {
     @NotNull(message = "Student ID is required")
     private Long studentId;
 
+    @NotNull(message = "Student Email is required")
+    private String studentEmail;
+
     @NotNull(message = "Semester is required")
     @Positive(message = "Semester must be greater than 0")
     private Integer semester;
@@ -21,6 +24,14 @@ public class TranscriptRequestDTO {
 
     public void setStudentId(Long studentId) {
         this.studentId = studentId;
+    }
+
+    public String getStudentEmail() {        // ADD
+        return studentEmail;
+    }
+
+    public void setStudentEmail(String studentEmail) {   // ADD
+        this.studentEmail = studentEmail;
     }
 
     public Integer getSemester() {

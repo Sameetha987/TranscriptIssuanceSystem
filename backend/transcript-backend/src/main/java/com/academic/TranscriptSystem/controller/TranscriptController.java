@@ -4,6 +4,7 @@ import com.academic.TranscriptSystem.entity.Transcript;
 import com.academic.TranscriptSystem.service.TranscriptService;
 import com.academic.TranscriptSystem.response.ApiResponse;
 import com.academic.TranscriptSystem.dto.TranscriptRequestDTO;
+import org.springframework.security.core.Authentication;
 
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ public class TranscriptController {
 
         Transcript transcript = new Transcript();
         transcript.setStudentId(request.getStudentId());
+        transcript.setStudentEmail(request.getStudentEmail());
         transcript.setSemester(request.getSemester());
         transcript.setCgpa(request.getCgpa());
         transcript.setBlockchainHash("pending");
@@ -37,9 +39,12 @@ public class TranscriptController {
 
 
     // Get Student Transcripts
-    @GetMapping("/student/{studentId}")
-    public List<Transcript> getStudentTranscripts(@PathVariable Long studentId) {
-        return transcriptService.getStudentTranscripts(studentId);
+    @GetMapping("/my")
+    public List<Transcript> getMyTranscripts(Authentication authentication) {
+
+        String email = authentication.getName();
+
+        return transcriptService.getTranscriptsByStudentEmail(email);
     }
 
     // Get Transcript by ID

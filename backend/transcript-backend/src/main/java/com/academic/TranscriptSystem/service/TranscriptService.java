@@ -13,4 +13,6 @@ public interface TranscriptService {
 
     // Get transcript by ID
     Transcript getTranscriptById(Long transcriptId);
+
+    List<Transcript> getTranscriptsByStudentEmail(String email);
 }

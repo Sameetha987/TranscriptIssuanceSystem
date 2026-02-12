@@ -17,9 +17,12 @@ public class Transcript {
 
     private Long studentId;
 
+    private String studentEmail;
+
     private Integer semester;
 
     private Double cgpa;
 
     private String blockchainHash;
+
 }
