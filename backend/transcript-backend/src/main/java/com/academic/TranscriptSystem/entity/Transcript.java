@@ -27,4 +27,6 @@ public class Transcript {
 
     private String blockchainTxId;
 
+    private String qrCodeUrl;
+
 }

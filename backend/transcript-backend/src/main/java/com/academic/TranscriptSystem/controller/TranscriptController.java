@@ -6,6 +6,10 @@ import com.academic.TranscriptSystem.service.TranscriptService;
 import com.academic.TranscriptSystem.response.ApiResponse;
 import com.academic.TranscriptSystem.dto.TranscriptRequestDTO;
 import org.springframework.security.core.Authentication;
+import com.academic.TranscriptSystem.dto.TranscriptVerificationResponseDTO;
+import com.academic.TranscriptSystem.service.VerificationService;
+
+
 
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -17,10 +21,14 @@ import java.util.List;
 public class TranscriptController {
 
     private final TranscriptService transcriptService;
+    private final VerificationService verificationService;
 
-    public TranscriptController(TranscriptService transcriptService) {
+    public TranscriptController(TranscriptService transcriptService,
+                                VerificationService verificationService) {
         this.transcriptService = transcriptService;
+        this.verificationService = verificationService;
     }
+
 
     // Issue Transcript
     @PostMapping("/issue")
@@ -56,8 +64,20 @@ public class TranscriptController {
     }
 
     @GetMapping("/verify/{id}")
-    public VerificationResponseDTO verifyTranscript(@PathVariable Long id) {
-        return transcriptService.verifyTranscript(id);
+    public ApiResponse<TranscriptVerificationResponseDTO> verifyTranscript(@PathVariable Long id) {
+
+        TranscriptVerificationResponseDTO response =
+                verificationService.verifyTranscript(id);
+
+        return new ApiResponse<>(
+                true,
+                "Verification completed",
+                response
+        );
     }
 
+
 }
+
+
+
