@@ -1,5 +1,6 @@
 package com.academic.TranscriptSystem.service;
 
+import com.academic.TranscriptSystem.dto.VerificationResponseDTO;
 import com.academic.TranscriptSystem.entity.Transcript;
 import java.util.List;
 
@@ -15,4 +16,6 @@ public interface TranscriptService {
     Transcript getTranscriptById(Long transcriptId);
 
     List<Transcript> getTranscriptsByStudentEmail(String email);
+
+    VerificationResponseDTO verifyTranscript(Long transcriptId);
 }

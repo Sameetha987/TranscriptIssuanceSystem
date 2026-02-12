@@ -1,5 +1,6 @@
 package com.academic.TranscriptSystem.controller;
 
+import com.academic.TranscriptSystem.dto.VerificationResponseDTO;
 import com.academic.TranscriptSystem.entity.Transcript;
 import com.academic.TranscriptSystem.service.TranscriptService;
 import com.academic.TranscriptSystem.response.ApiResponse;
@@ -50,6 +51,13 @@ public class TranscriptController {
     // Get Transcript by ID
     @GetMapping("/{id}")
     public Transcript getTranscriptById(@PathVariable Long id) {
+
         return transcriptService.getTranscriptById(id);
     }
+
+    @GetMapping("/verify/{id}")
+    public VerificationResponseDTO verifyTranscript(@PathVariable Long id) {
+        return transcriptService.verifyTranscript(id);
+    }
+
 }

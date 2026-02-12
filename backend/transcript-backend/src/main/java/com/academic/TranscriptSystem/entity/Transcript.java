@@ -25,4 +25,6 @@ public class Transcript {
 
     private String blockchainHash;
 
+    private String blockchainTxId;
+
 }
