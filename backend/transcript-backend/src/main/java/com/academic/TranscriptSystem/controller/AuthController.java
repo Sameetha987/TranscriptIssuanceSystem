@@ -8,6 +8,8 @@ import com.academic.TranscriptSystem.response.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import com.academic.TranscriptSystem.security.JwtUtil;
+
 
 @RestController
 @RequestMapping("/api/auth/admin")
@@ -15,11 +17,15 @@ public class AuthController {
 
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+
 
     public AuthController(AdminRepository adminRepository,
-                          PasswordEncoder passwordEncoder) {
+                          PasswordEncoder passwordEncoder,
+                          JwtUtil jwtUtil) {
         this.adminRepository = adminRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/login")
@@ -40,7 +46,8 @@ public class AuthController {
         if (!passwordMatches) {
             return new ApiResponse<>(false, "Invalid password", null);
         }
+        String token = jwtUtil.generateToken(admin.getUsername());
 
-        return new ApiResponse<>(true, "Login successful", "Login OK");
+        return new ApiResponse<>(true, "Login successful", token);
     }
 }
