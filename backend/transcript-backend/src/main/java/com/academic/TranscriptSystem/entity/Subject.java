@@ -17,9 +17,9 @@ public class Subject {
 
     private Long transcriptId;
 
-    private String subjectCode;
-    private String subjectName;
+    private String code;
+    private String name;
     private Integer credits;
-    private Double marks;
+    private Integer marks;
     private String grade;
 }
