@@ -2,12 +2,16 @@ package com.academic.TranscriptSystem.controller;
 
 import com.academic.TranscriptSystem.dto.VerificationResponseDTO;
 import com.academic.TranscriptSystem.entity.Transcript;
+import com.academic.TranscriptSystem.service.PdfService;
 import com.academic.TranscriptSystem.service.TranscriptService;
 import com.academic.TranscriptSystem.response.ApiResponse;
 import com.academic.TranscriptSystem.dto.TranscriptRequestDTO;
 import org.springframework.security.core.Authentication;
 import com.academic.TranscriptSystem.dto.TranscriptVerificationResponseDTO;
 import com.academic.TranscriptSystem.service.VerificationService;
+import com.academic.TranscriptSystem.service.PdfService;
+import jakarta.servlet.http.HttpServletResponse;
+
 
 
 
@@ -22,11 +26,13 @@ public class TranscriptController {
 
     private final TranscriptService transcriptService;
     private final VerificationService verificationService;
+    private final PdfService pdfService;
 
     public TranscriptController(TranscriptService transcriptService,
-                                VerificationService verificationService) {
+                                VerificationService verificationService, PdfService pdfService) {
         this.transcriptService = transcriptService;
         this.verificationService = verificationService;
+        this.pdfService = pdfService;
     }
 
 
@@ -37,6 +43,9 @@ public class TranscriptController {
         Transcript transcript = new Transcript();
         transcript.setStudentId(request.getStudentId());
         transcript.setStudentEmail(request.getStudentEmail());
+        transcript.setStudentName(request.getStudentName());
+        transcript.setProgram(request.getProgram());
+        transcript.setDepartment(request.getDepartment());
         transcript.setSemester(request.getSemester());
         transcript.setCgpa(request.getCgpa());
         transcript.setBlockchainHash("pending");
@@ -74,6 +83,18 @@ public class TranscriptController {
                 "Verification completed",
                 response
         );
+    }
+
+
+    @GetMapping("/{id}/pdf")
+    public void downloadTranscript(@PathVariable Long id,
+                                   HttpServletResponse response) {
+
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition",
+                "attachment; filename=transcript_" + id + ".pdf");
+
+        pdfService.generateTranscriptPdf(id, response);
     }
 
 

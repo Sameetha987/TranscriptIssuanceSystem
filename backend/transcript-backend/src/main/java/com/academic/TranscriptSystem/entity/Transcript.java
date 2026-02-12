@@ -19,6 +19,12 @@ public class Transcript {
 
     private String studentEmail;
 
+    private String studentName;
+
+    private String program;
+
+    private String department;
+
     private Integer semester;
 
     private Double cgpa;
