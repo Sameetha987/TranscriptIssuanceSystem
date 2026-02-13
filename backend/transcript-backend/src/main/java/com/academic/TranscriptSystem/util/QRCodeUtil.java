@@ -33,4 +33,26 @@ public class QRCodeUtil {
             throw new RuntimeException("QR generation failed");
         }
     }
+    public static byte[] generateQrCodeImage(String text, int width, int height) {
+        try {
+            QRCodeWriter writer = new QRCodeWriter();
+            BitMatrix matrix = writer.encode(text, BarcodeFormat.QR_CODE, width, height);
+
+            BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    image.setRGB(x, y, matrix.get(x, y) ? 0x000000 : 0xFFFFFF);
+                }
+            }
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(image, "png", baos);
+
+            return baos.toByteArray();
+
+        } catch (Exception e) {
+            throw new RuntimeException("QR image generation failed");
+        }
+    }
 }

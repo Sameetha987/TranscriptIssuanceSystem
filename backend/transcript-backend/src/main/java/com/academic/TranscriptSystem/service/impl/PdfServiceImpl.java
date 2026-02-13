@@ -5,6 +5,7 @@ import com.academic.TranscriptSystem.entity.Subject;
 import com.academic.TranscriptSystem.repository.TranscriptRepository;
 import com.academic.TranscriptSystem.repository.SubjectRepository;
 import com.academic.TranscriptSystem.service.PdfService;
+import com.academic.TranscriptSystem.util.QRCodeUtil;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 
@@ -77,6 +78,16 @@ public class PdfServiceImpl implements PdfService {
 
             document.add(table);
 
+
+            String verifyUrl = "http://localhost:8080/api/transcripts/verify/" + transcript.getId();
+
+            /* Generate QR image */
+            byte[] qrImage = QRCodeUtil.generateQrCodeImage(verifyUrl, 200, 200);
+
+            /* Add QR to PDF */
+            Image qr = Image.getInstance(qrImage);
+            qr.setAlignment(Image.ALIGN_RIGHT);
+            document.add(qr);
             document.close();
 
         } catch (Exception e) {
