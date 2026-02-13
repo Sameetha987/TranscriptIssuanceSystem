@@ -96,6 +96,12 @@ public class TranscriptController {
 
         pdfService.generateTranscriptPdf(id, response);
     }
+    @GetMapping("/public/verify/{id}")
+    public TranscriptVerificationResponseDTO publicVerify(@PathVariable Long id) {
+
+        return verificationService.verifyTranscript(id);
+
+    }
 
 
 }
