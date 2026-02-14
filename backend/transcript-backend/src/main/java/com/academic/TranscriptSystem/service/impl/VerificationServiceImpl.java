@@ -34,7 +34,14 @@ public class VerificationServiceImpl implements VerificationService {
                     null
             );
         }
-
+        if (transcript.getBlockchainTxId() == null) {
+            return new TranscriptVerificationResponseDTO(
+                    transcriptId,
+                    transcript.getStudentEmail(),
+                    "BLOCKCHAIN_NOT_FOUND",
+                    null
+            );
+        }
         String blockchainHash = blockchainService.getHashFromBlockchain(transcript.getBlockchainTxId());
 
         String dataToHash = transcript.getStudentId() +
@@ -50,7 +57,8 @@ public class VerificationServiceImpl implements VerificationService {
 
         /* ---------- QR GENERATION ---------- */
 
-        String verifyUrl = "http://localhost:8080/api/verify/" + transcriptId;
+        String verifyUrl =
+                "http://localhost:8080/api/transcripts/public/verify/" + transcriptId;
 
         String qrCodeBase64 = QRCodeUtil.generateBase64QRCode(verifyUrl);
 
