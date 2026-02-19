@@ -1,24 +1,25 @@
 package com.academic.TranscriptSystem.blockchain.service.impl;
 
 import com.academic.TranscriptSystem.blockchain.service.BlockchainService;
+import com.academic.TranscriptSystem.service.impl.VerificationServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.web3j.protocol.Web3j;
-import org.web3j.crypto.Credentials;
-import org.web3j.protocol.core.methods.response.EthSendTransaction;
-import org.web3j.tx.gas.ContractGasProvider;
-import org.web3j.tx.RawTransactionManager;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
-import org.web3j.abi.datatypes.Function;
-import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.abi.TypeReference;
+import org.web3j.abi.datatypes.Function;
 import org.web3j.abi.datatypes.Type;
+import org.web3j.abi.datatypes.Utf8String;
+import org.web3j.crypto.Credentials;
+import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.EthCall;
+import org.web3j.protocol.core.methods.response.EthSendTransaction;
+import org.web3j.tx.RawTransactionManager;
+import org.web3j.tx.gas.ContractGasProvider;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -29,6 +30,7 @@ public class BlockchainServiceImpl implements BlockchainService {
     private final ContractGasProvider gasProvider;
 
     private final String CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+    private static final Logger log = LoggerFactory.getLogger(BlockchainServiceImpl.class);
 
     public BlockchainServiceImpl(Web3j web3j,
                                  Credentials credentials,
@@ -61,11 +63,11 @@ public class BlockchainServiceImpl implements BlockchainService {
                             encodedFunction,
                             null
                     );
-
             return receipt.getTransactionHash();
 
         } catch (Exception e) {
-            throw new RuntimeException("Blockchain store failed", e);
+            log.error("Blockchain transaction failed", e);
+            throw new RuntimeException("Blockchain transaction failed", e);
         }
     }
 

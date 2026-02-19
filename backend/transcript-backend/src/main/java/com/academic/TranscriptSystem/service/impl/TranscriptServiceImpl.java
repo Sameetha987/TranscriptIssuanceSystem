@@ -5,6 +5,7 @@ import com.academic.TranscriptSystem.entity.Transcript;
 import com.academic.TranscriptSystem.repository.TranscriptRepository;
 import com.academic.TranscriptSystem.security.HashUtil;
 import com.academic.TranscriptSystem.service.TranscriptService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +26,11 @@ public class TranscriptServiceImpl implements TranscriptService {
     }
 
     @Override
+    @Transactional
     public Transcript issueTranscript(Transcript transcript) {
 
         String dataToHash =
-                transcript.getStudentId() +
+                        transcript.getStudentId() +
                         transcript.getStudentEmail() +
                         transcript.getSemester() +
                         transcript.getCgpa();
@@ -39,11 +41,17 @@ public class TranscriptServiceImpl implements TranscriptService {
         transcript.setBlockchainHash(hash);
 
         // store hash to blockchain
-        String txId = blockchainService.storeHash(hash);
+        try {
+            String txId = blockchainService.storeHash(hash);
+            transcript.setBlockchainTxId(txId);
+            log.info("Stored hash on blockchain. TxId: {}", txId);
+            return transcriptRepository.save(transcript);
 
-        transcript.setBlockchainTxId(txId);
-        log.info("Stored hash on blockchain. TxId: {}", txId);
-        return transcriptRepository.save(transcript);
+        } catch (Exception e) {
+
+            log.error("Transcript issuance failed due to blockchain error");
+            throw new RuntimeException("Transcript issuance failed. Blockchain error.");
+        }
     }
 
 
