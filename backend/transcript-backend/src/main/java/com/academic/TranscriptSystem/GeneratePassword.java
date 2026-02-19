@@ -7,6 +7,5 @@ public class GeneratePassword {
     public static void main(String[] args) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String hash = encoder.encode("admin123");
-        System.out.println(hash);
     }
 }

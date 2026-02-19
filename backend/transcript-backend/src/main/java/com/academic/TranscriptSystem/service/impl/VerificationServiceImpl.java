@@ -8,13 +8,15 @@ import com.academic.TranscriptSystem.security.HashUtil;
 import com.academic.TranscriptSystem.service.VerificationService;
 import com.academic.TranscriptSystem.util.QRCodeUtil;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class VerificationServiceImpl implements VerificationService {
 
     private final TranscriptRepository transcriptRepository;
     private final BlockchainService blockchainService;
-
+    private static final Logger log = LoggerFactory.getLogger(VerificationServiceImpl.class);
     public VerificationServiceImpl(TranscriptRepository transcriptRepository,
                                    BlockchainService blockchainService) {
         this.transcriptRepository = transcriptRepository;
@@ -42,6 +44,7 @@ public class VerificationServiceImpl implements VerificationService {
                     null
             );
         }
+        log.info("Verifying transcript ID: {}", transcriptId);
         String blockchainHash = blockchainService.getHashFromBlockchain(transcript.getBlockchainTxId());
 
         String dataToHash = transcript.getStudentId() +
@@ -50,7 +53,7 @@ public class VerificationServiceImpl implements VerificationService {
                 transcript.getCgpa();
 
         String recalculatedHash = HashUtil.generateHash(dataToHash);
-
+        log.info("Verification result: {}", recalculatedHash.equals(blockchainHash));
         boolean valid = recalculatedHash.equals(blockchainHash);
 
         String status = valid ? "AUTHENTIC" : "TAMPERED";
