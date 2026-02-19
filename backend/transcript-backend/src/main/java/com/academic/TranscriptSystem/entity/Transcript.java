@@ -29,6 +29,8 @@ public class Transcript {
 
     private Double cgpa;
 
+    private Long blockchainRecordId;
+
     private String blockchainHash;
 
     private String blockchainTxId;

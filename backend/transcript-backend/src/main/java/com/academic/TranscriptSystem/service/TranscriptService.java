@@ -17,5 +17,4 @@ public interface TranscriptService {
 
     List<Transcript> getTranscriptsByStudentEmail(String email);
 
-    VerificationResponseDTO verifyTranscript(Long transcriptId);
 }

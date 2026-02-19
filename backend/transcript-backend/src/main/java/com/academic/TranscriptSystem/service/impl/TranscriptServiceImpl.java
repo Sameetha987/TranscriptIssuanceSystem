@@ -59,34 +59,5 @@ public class TranscriptServiceImpl implements TranscriptService {
         return transcriptRepository.findByStudentEmail(email);
     }
 
-    @Override
-    public VerificationResponseDTO verifyTranscript(Long transcriptId) {
-
-        Transcript transcript =
-                transcriptRepository.findById(transcriptId).orElse(null);
-
-        if (transcript == null) {
-            return new VerificationResponseDTO(false, "Transcript not found");
-        }
-
-        String recalculatedHash =
-                HashUtil.generateHash(
-                        transcript.getStudentId() +
-                                transcript.getStudentEmail() +
-                                transcript.getSemester() +
-                                transcript.getCgpa()
-                );
-
-        String blockchainHash =
-                blockchainService.getHashFromBlockchain(transcript.getBlockchainTxId());
-        System.out.println("Stored: " + blockchainHash);
-        System.out.println("New: " + recalculatedHash);
-        if (recalculatedHash.equals(blockchainHash)) {
-            return new VerificationResponseDTO(true, "Transcript VERIFIED");
-        } else {
-            return new VerificationResponseDTO(false, "Transcript TAMPERED");
-        }
-
-    }
 
 }
