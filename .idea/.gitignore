@@ -4,4 +4,7 @@
 /target
 /node_modules
 .env
-application.properties
+.idea
+.vscode
+*.log
+backend/transcript-backend/src/main/resources/application.properties
