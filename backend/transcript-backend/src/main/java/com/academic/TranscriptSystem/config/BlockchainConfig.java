@@ -1,24 +1,29 @@
 package com.academic.TranscriptSystem.config;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.crypto.Credentials;
 import org.web3j.tx.gas.DefaultGasProvider;
+import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 public class BlockchainConfig {
 
+    @Value("${blockchain.private-key}")
+    private String privateKey;
+
+    @Value("${blockchain.rpc-url}")
+    private String rpcUrl;
+
     @Bean
     public Web3j web3j() {
-        return Web3j.build(new HttpService("http://127.0.0.1:8545"));
+        return Web3j.build(new HttpService(rpcUrl));
     }
 
     @Bean
     public Credentials credentials() {
-        // Use first Hardhat private key
-        return Credentials.create("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80");
+        return Credentials.create(privateKey);
     }
 
     @Bean

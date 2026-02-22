@@ -36,7 +36,8 @@ public class VerificationServiceImpl implements VerificationService {
                     null
             );
         }
-        if (transcript.getBlockchainTxId() == null) {
+
+        if (transcript.getBlockchainRecordId() == null) {
             return new TranscriptVerificationResponseDTO(
                     transcriptId,
                     transcript.getStudentEmail(),
@@ -44,26 +45,50 @@ public class VerificationServiceImpl implements VerificationService {
                     null
             );
         }
-        log.info("Verifying transcript ID: {}", transcriptId);
-        String blockchainHash = blockchainService.getHashFromBlockchain(transcript.getBlockchainTxId());
 
-        String dataToHash = transcript.getStudentId() +
-                transcript.getStudentEmail() +
-                transcript.getSemester() +
-                transcript.getCgpa();
+        log.info("Verifying transcript ID: {}", transcriptId);
+
+        String blockchainHash;
+
+        try {
+
+            blockchainHash =
+                    blockchainService.getHashFromBlockchain(
+                            transcript.getBlockchainRecordId()
+                    );
+        } catch (Exception e) {
+            log.error("Blockchain verification failed", e);
+
+            return new TranscriptVerificationResponseDTO(
+                    transcriptId,
+                    transcript.getStudentEmail(),
+                    "BLOCKCHAIN_ERROR",
+                    null
+            );
+        }
+
+        String dataToHash =
+                transcript.getStudentId() +
+                        transcript.getStudentEmail() +
+                        transcript.getSemester() +
+                        transcript.getCgpa();
 
         String recalculatedHash = HashUtil.generateHash(dataToHash);
-        log.info("Verification result: {}", recalculatedHash.equals(blockchainHash));
+
+        log.info("Blockchain Hash: {}", blockchainHash);
+        log.info("Recalculated Hash: {}", recalculatedHash);
+
         boolean valid = recalculatedHash.equals(blockchainHash);
 
-        String status = valid ? "AUTHENTIC" : "TAMPERED";
+        log.info("Verification result: {}", valid);
 
-        /* ---------- QR GENERATION ---------- */
+        String status = valid ? "AUTHENTIC" : "TAMPERED";
 
         String verifyUrl =
                 "http://localhost:8080/api/transcripts/public/verify/" + transcriptId;
 
-        String qrCodeBase64 = QRCodeUtil.generateBase64QRCode(verifyUrl);
+        String qrCodeBase64 =
+                QRCodeUtil.generateBase64QRCode(verifyUrl);
 
         return new TranscriptVerificationResponseDTO(
                 transcriptId,
@@ -72,5 +97,6 @@ public class VerificationServiceImpl implements VerificationService {
                 qrCodeBase64
         );
     }
+
 
 }

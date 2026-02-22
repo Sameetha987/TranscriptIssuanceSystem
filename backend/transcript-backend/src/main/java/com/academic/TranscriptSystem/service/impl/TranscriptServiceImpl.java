@@ -45,6 +45,8 @@ public class TranscriptServiceImpl implements TranscriptService {
             String txId = blockchainService.storeHash(hash);
             transcript.setBlockchainTxId(txId);
             log.info("Stored hash on blockchain. TxId: {}", txId);
+            Long recordId = blockchainService.getLatestRecordId();
+            transcript.setBlockchainRecordId(recordId);
             return transcriptRepository.save(transcript);
 
         } catch (Exception e) {

@@ -1,3 +1,7 @@
 # Default ignored files
 /shelf/
 /workspace.xml
+/target
+/node_modules
+.env
+application.properties
