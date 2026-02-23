@@ -17,41 +17,74 @@ const AdminLogin = () => {
       });
 
       const token = response.data.data;
-
       login(token, "ADMIN");
-
       navigate("/admin");
-    } catch (error) {
-      alert("Login failed. Check credentials.");
+    } catch {
+      alert("Invalid credentials");
     }
   };
 
   return (
-    <div className="min-h-screen bg-blue-600 flex items-center justify-center">
-      <div className="bg-white p-8 rounded shadow w-80">
-        <h2 className="text-2xl font-bold mb-4 text-center">
-          Admin Login
-        </h2>
+    <div className="min-h-screen flex">
 
-        <input
-          className="border p-2 w-full mb-3"
-          placeholder="Username"
-          onChange={(e) => setUsername(e.target.value)}
-        />
+      {/* Left Branding Panel */}
+      <div className="hidden md:flex w-1/2 bg-slate-900 text-white flex-col justify-center px-16">
 
-        <input
-          type="password"
-          className="border p-2 w-full mb-3"
-          placeholder="Password"
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <h1 className="text-4xl font-bold mb-6 leading-tight">
+          University Transcript System
+        </h1>
 
-        <button
-          className="bg-blue-600 text-white w-full p-2 rounded"
-          onClick={handleLogin}
-        >
-          Login
-        </button>
+        <p className="text-slate-300 text-lg mb-8">
+          Secure • Blockchain Verified • Tamper Proof
+        </p>
+
+        <div className="h-1 w-24 bg-emerald-500 rounded"></div>
+
+      </div>
+
+      {/* Right Login Form */}
+      <div className="flex flex-1 items-center justify-center bg-white">
+
+        <div className="w-full max-w-md p-10 border border-gray-200 rounded-2xl shadow-xl">
+
+          <h2 className="text-2xl font-semibold text-slate-800 mb-8 text-center">
+            Admin Login
+          </h2>
+
+          <div className="space-y-6">
+
+            <div>
+              <label className="text-sm font-medium text-slate-600">
+                Username
+              </label>
+              <input
+                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 transition"
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-slate-600">
+                Password
+              </label>
+              <input
+                type="password"
+                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700 transition"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+
+            <button
+              onClick={handleLogin}
+              className="w-full bg-blue-800 hover:bg-blue-900 transition text-white p-3 rounded-lg font-medium"
+            >
+              Sign In
+            </button>
+
+          </div>
+
+        </div>
+
       </div>
     </div>
   );

@@ -15,33 +15,51 @@ const AdminLayout = () => {
     <div className="flex min-h-screen">
 
       {/* Sidebar */}
-      <div className="w-64 bg-gray-900 text-white p-6">
-        <h2 className="text-xl font-bold mb-6">Admin Panel</h2>
+      <div className="w-64 bg-slate-900 text-white flex flex-col">
 
-        <nav className="space-y-3">
-          <Link to="/admin" className="block hover:text-blue-400">
+        <div className="p-6 border-b border-slate-700">
+          <h2 className="text-xl font-bold tracking-wide">
+            Admin Panel
+          </h2>
+        </div>
+
+        <nav className="flex-1 p-6 space-y-3 text-slate-300">
+
+          <Link
+            to="/admin"
+            className="block px-3 py-2 rounded-lg hover:bg-slate-800 hover:text-white transition"
+          >
             Dashboard
           </Link>
 
-          <Link to="/admin/issue" className="block hover:text-blue-400">
+          <Link
+            to="/admin/issue"
+            className="block px-3 py-2 rounded-lg hover:bg-slate-800 hover:text-white transition"
+          >
             Issue Transcript
           </Link>
 
-          <Link to="/admin/transcripts" className="block hover:text-blue-400">
+          <Link
+            to="/admin/transcripts"
+            className="block px-3 py-2 rounded-lg hover:bg-slate-800 hover:text-white transition"
+          >
             View Transcripts
           </Link>
 
+        </nav>
+
+        <div className="p-6 border-t border-slate-700">
           <button
             onClick={handleLogout}
-            className="mt-6 text-red-400 hover:text-red-600"
+            className="text-emerald-400 hover:text-emerald-500 transition"
           >
             Logout
           </button>
-        </nav>
+        </div>
       </div>
 
       {/* Content */}
-      <div className="flex-1 bg-gray-100 p-8">
+      <div className="flex-1 bg-gray-100 p-10 space-y-10">
         <Outlet />
       </div>
     </div>
