@@ -11,6 +11,27 @@ const AdminTranscripts = () => {
     fetchTranscripts();
   }, []);
 
+  const downloadPdf = async (id) => {
+    try {
+      const response = await axios.get(
+        `/api/transcripts/${id}/pdf`,
+        {
+          responseType: "blob",
+        }
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `transcript_${id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error("PDF download failed", error);
+    }
+  };
+
   const fetchTranscripts = async () => {
     try {
       const response = await axios.get("/api/transcripts");
@@ -51,6 +72,7 @@ const AdminTranscripts = () => {
               <th className="px-6 py-4">Semester</th>
               <th className="px-6 py-4">CGPA</th>
               <th className="px-6 py-4">Status</th>
+              <th className="px-6 py-4">Actions</th>
             </tr>
           </thead>
 
@@ -72,6 +94,23 @@ const AdminTranscripts = () => {
                       t.blockchainHash ? "AUTHENTIC" : "PENDING"
                     }
                   />
+                </td>
+                <td className="px-6 py-4 space-x-2">
+
+                  <button
+                    onClick={() => downloadPdf(t.id)}
+                    className="px-3 py-1 text-sm bg-blue-800 text-white rounded-md hover:bg-blue-900 transition"
+                  >
+                    PDF
+                  </button>
+
+                  <button
+                    onClick={() => window.open(`http://localhost:8080/api/transcripts/public/verify/${t.id}`)}
+                    className="px-3 py-1 text-sm bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition"
+                  >
+                    Verify
+                  </button>
+
                 </td>
               </tr>
             ))}
