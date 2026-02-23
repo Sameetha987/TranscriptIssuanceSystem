@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AdminLogin from "../features/admin/AdminLogin";
 import ProtectedRoute from "../components/ProtectedRoute";
 import AdminLayout from "../layouts/AdminLayout";
+import AdminTranscripts from "../features/admin/AdminTranscripts";
 
 const Dashboard = () => {
   return (
@@ -71,6 +72,7 @@ const AppRoutes = () => {
         >
           <Route index element={<Dashboard />} />
           <Route path="issue" element={<IssueTranscript />} />
+          <Route path="transcripts" element={<AdminTranscripts />} />
         </Route>
 
         <Route path="*" element={<AdminLogin />} />

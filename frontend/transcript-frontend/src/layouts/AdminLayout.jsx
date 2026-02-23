@@ -51,7 +51,7 @@ const AdminLayout = () => {
         <div className="p-6 border-t border-slate-700">
           <button
             onClick={handleLogout}
-            className="text-emerald-400 hover:text-emerald-500 transition"
+            className="text-red-400 hover:text-red-500 transition"
           >
             Logout
           </button>
@@ -59,7 +59,7 @@ const AdminLayout = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 bg-gray-100 p-10 space-y-10">
+      <div className="flex-1 bg-slate-200 p-10 space-y-10">
         <Outlet />
       </div>
     </div>
