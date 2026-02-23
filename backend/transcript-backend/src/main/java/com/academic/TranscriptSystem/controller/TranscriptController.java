@@ -54,7 +54,10 @@ public class TranscriptController {
 
         return new ApiResponse<>(true, "Transcript issued successfully", saved);
     }
-
+    @GetMapping
+    public List<Transcript> getAllTranscripts() {
+        return transcriptService.getAllTranscripts();
+    }
 
     // Get Student Transcripts
     @GetMapping("/my")

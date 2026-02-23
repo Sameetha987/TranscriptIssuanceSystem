@@ -56,6 +56,10 @@ public class TranscriptServiceImpl implements TranscriptService {
         }
     }
 
+    @Override
+    public List<Transcript> getAllTranscripts() {
+        return transcriptRepository.findAll();
+    }
 
     @Override
     public List<Transcript> getStudentTranscripts(Long studentId) {

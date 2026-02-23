@@ -11,7 +11,8 @@ public interface TranscriptService {
 
     // Get all transcripts of a student
     List<Transcript> getStudentTranscripts(Long studentId);
-
+    //Fetch all transcripts
+    List<Transcript> getAllTranscripts();
     // Get transcript by ID
     Transcript getTranscriptById(Long transcriptId);
 
