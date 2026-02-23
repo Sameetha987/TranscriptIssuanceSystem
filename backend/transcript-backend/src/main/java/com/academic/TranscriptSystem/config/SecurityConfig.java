@@ -20,13 +20,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+                .cors(cors -> {})
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/transcripts/issue").hasRole("ADMIN")
                         .requestMatchers("/api/transcripts/student/**").hasAnyRole("ADMIN","STUDENT")
                         .requestMatchers("/api/transcripts/my").hasRole("STUDENT")
-                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/transcripts/public/**").permitAll()
                         .anyRequest().authenticated()
                 )
