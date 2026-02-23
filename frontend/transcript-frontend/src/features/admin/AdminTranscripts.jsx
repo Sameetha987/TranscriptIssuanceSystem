@@ -1,18 +1,36 @@
+import { useEffect, useState } from "react";
+import axios from "../../api/axios";
 import StatusBadge from "../../components/StatusBadge";
 
 const AdminTranscripts = () => {
 
-  // Temporary dummy data
-  const transcripts = [
-    { id: 1, student: "John Doe", semester: 5, cgpa: 8.4, status: "AUTHENTIC" },
-    { id: 2, student: "Alice Smith", semester: 6, cgpa: 9.1, status: "AUTHENTIC" },
-    { id: 3, student: "Robert Lee", semester: 4, cgpa: 7.8, status: "TAMPERED" },
-  ];
+  const [transcripts, setTranscripts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchTranscripts();
+  }, []);
+
+  const fetchTranscripts = async () => {
+    try {
+      const response = await axios.get("/api/transcripts");
+      setTranscripts(response.data);
+    } catch (error) {
+      console.error("Error fetching transcripts", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="flex justify-center py-10">
+             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-blue-800"></div>
+           </div>;
+  }
 
   return (
     <div>
 
-      {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-slate-800">
           Transcripts
@@ -22,7 +40,6 @@ const AdminTranscripts = () => {
         </p>
       </div>
 
-      {/* Table Card */}
       <div className="bg-white rounded-xl shadow-md overflow-hidden">
 
         <table className="w-full text-left">
@@ -46,11 +63,15 @@ const AdminTranscripts = () => {
                 <td className="px-6 py-4 font-medium text-slate-800">
                   #{t.id}
                 </td>
-                <td className="px-6 py-4">{t.student}</td>
+                <td className="px-6 py-4">{t.studentName}</td>
                 <td className="px-6 py-4">{t.semester}</td>
                 <td className="px-6 py-4">{t.cgpa}</td>
                 <td className="px-6 py-4">
-                  <StatusBadge status={t.status} />
+                  <StatusBadge
+                    status={
+                      t.blockchainHash ? "AUTHENTIC" : "PENDING"
+                    }
+                  />
                 </td>
               </tr>
             ))}
