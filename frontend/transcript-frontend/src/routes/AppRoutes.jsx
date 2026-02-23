@@ -4,6 +4,7 @@ import AdminLogin from "../features/admin/AdminLogin";
 import ProtectedRoute from "../components/ProtectedRoute";
 import AdminLayout from "../layouts/AdminLayout";
 import AdminTranscripts from "../features/admin/AdminTranscripts";
+import IssueTranscript from "../features/admin/IssueTranscript";
 
 const Dashboard = () => {
   return (
@@ -51,11 +52,6 @@ const Dashboard = () => {
     </div>
   );
 };
-
-const IssueTranscript = () => (
-  <div className="text-xl">Issue Transcript Page</div>
-);
-
 const AppRoutes = () => {
   return (
     <BrowserRouter>
