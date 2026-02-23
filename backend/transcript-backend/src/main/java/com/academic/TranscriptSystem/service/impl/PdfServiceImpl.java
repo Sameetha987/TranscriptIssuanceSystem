@@ -9,6 +9,7 @@ import com.academic.TranscriptSystem.util.QRCodeUtil;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 
+import com.lowagie.text.pdf.draw.LineSeparator;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Service;
 
@@ -34,60 +35,96 @@ public class PdfServiceImpl implements PdfService {
             Transcript transcript = transcriptRepository.findById(transcriptId).orElseThrow();
             List<Subject> subjects = subjectRepository.findByTranscriptId(transcriptId);
 
-            Document document = new Document();
+            Document document = new Document(PageSize.A4, 50, 50, 60, 50);
             PdfWriter.getInstance(document, response.getOutputStream());
-
             document.open();
 
             /* ================= HEADER ================= */
-            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16);
-            Paragraph title = new Paragraph("UNIVERSITY TRANSCRIPT", titleFont);
-            title.setAlignment(Element.ALIGN_CENTER);
-            document.add(title);
 
+            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20);
+            Font sectionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14);
+            Font normalFont = FontFactory.getFont(FontFactory.HELVETICA, 12);
+            Font boldFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
+
+            Paragraph university = new Paragraph("UNIVERSITY TRANSCRIPT", titleFont);
+            university.setAlignment(Element.ALIGN_CENTER);
+            university.setSpacingAfter(10f);
+            document.add(university);
+
+            document.add(new LineSeparator());
             document.add(new Paragraph(" "));
 
             /* ================= STUDENT DETAILS ================= */
-            document.add(new Paragraph("Student Name: " + transcript.getStudentName()));
-            document.add(new Paragraph("Student Email: " + transcript.getStudentEmail()));
-            document.add(new Paragraph("Program: " + transcript.getProgram()));
-            document.add(new Paragraph("Department: " + transcript.getDepartment()));
-            document.add(new Paragraph("Semester: " + transcript.getSemester()));
-            document.add(new Paragraph("CGPA: " + transcript.getCgpa()));
-            document.add(new Paragraph("Blockchain TxId: " + transcript.getBlockchainTxId()));
 
+            document.add(new Paragraph("Student Name: " + transcript.getStudentName(), normalFont));
+            document.add(new Paragraph("Student Email: " + transcript.getStudentEmail(), normalFont));
+            document.add(new Paragraph("Program: " + transcript.getProgram(), normalFont));
+            document.add(new Paragraph("Department: " + transcript.getDepartment(), normalFont));
+            document.add(new Paragraph("Semester: " + transcript.getSemester(), normalFont));
+            document.add(new Paragraph("CGPA: " + transcript.getCgpa(), boldFont));
+            document.add(new Paragraph("Blockchain TxId: " + transcript.getBlockchainTxId(), normalFont));
+
+            document.add(new Paragraph(" "));
             document.add(new Paragraph(" "));
 
             /* ================= SUBJECT TABLE ================= */
-            PdfPTable table = new PdfPTable(5);
+
+            PdfPTable table = new PdfPTable(4);
             table.setWidthPercentage(100);
+            table.setSpacingBefore(10f);
+            table.setWidths(new float[]{2f, 4f, 2f, 2f});
 
-            table.addCell("Code");
-            table.addCell("Name");
-            table.addCell("Credits");
-            table.addCell("Marks");
-            table.addCell("Grade");
+            // Header cells
+            String[] headers = {"Code", "Subject Name", "Credits", "Grade"};
 
+            for (String header : headers) {
+                PdfPCell cell = new PdfPCell(new Phrase(header, boldFont));
+                cell.setBackgroundColor(new java.awt.Color(230, 240, 255));
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                cell.setPadding(8);
+                table.addCell(cell);
+            }
+
+            // Subject rows
             for (Subject s : subjects) {
-                table.addCell(s.getCode());
-                table.addCell(s.getName());
-                table.addCell(String.valueOf(s.getCredits()));
-                table.addCell(String.valueOf(s.getMarks()));
-                table.addCell(s.getGrade());
+
+                PdfPCell codeCell = new PdfPCell(new Phrase(s.getCode(), normalFont));
+                codeCell.setPadding(6);
+                table.addCell(codeCell);
+
+                PdfPCell nameCell = new PdfPCell(new Phrase(s.getName(), normalFont));
+                nameCell.setPadding(6);
+                table.addCell(nameCell);
+
+                PdfPCell creditCell = new PdfPCell(
+                        new Phrase(String.valueOf(s.getCredits()), normalFont));
+                creditCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                creditCell.setPadding(6);
+                table.addCell(creditCell);
+
+                PdfPCell gradeCell = new PdfPCell(
+                        new Phrase(s.getGrade(), boldFont));
+                gradeCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                gradeCell.setPadding(6);
+                table.addCell(gradeCell);
             }
 
             document.add(table);
 
+            document.add(new Paragraph(" "));
+            document.add(new Paragraph(" "));
 
-            String verifyUrl = "http://localhost:8080/api/transcripts/verify/" + transcript.getId();
+            /* ================= QR SECTION ================= */
 
-            /* Generate QR image */
-            byte[] qrImage = QRCodeUtil.generateQrCodeImage(verifyUrl, 200, 200);
+            String verifyUrl =
+                    "http://localhost:8080/api/transcripts/public/verify/" + transcript.getId();
 
-            /* Add QR to PDF */
+            byte[] qrImage = QRCodeUtil.generateQrCodeImage(verifyUrl, 150, 150);
+
             Image qr = Image.getInstance(qrImage);
             qr.setAlignment(Image.ALIGN_RIGHT);
             document.add(qr);
+
             document.close();
 
         } catch (Exception e) {
