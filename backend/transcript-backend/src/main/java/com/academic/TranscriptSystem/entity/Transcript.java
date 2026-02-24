@@ -1,10 +1,14 @@
 package com.academic.TranscriptSystem.entity;
 
+import com.academic.TranscriptSystem.dto.SubjectRequestDTO;
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.List;
 
 @Entity
-@Table(name = "transcripts")
+@Table(name = "transcripts", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"student_id", "semester"})
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,26 +19,20 @@ public class Transcript {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long studentId;
-
-    private String studentEmail;
-
-    private String studentName;
+    @ManyToOne
+    @JoinColumn(name = "student_id", nullable = false)
+    private Student student;
 
     private String program;
-
-    private String department;
 
     private Integer semester;
 
     private Double cgpa;
 
     private Long blockchainRecordId;
-
     private String blockchainHash;
-
     private String blockchainTxId;
 
-    private String qrCodeUrl;
-
+    @OneToMany(mappedBy = "transcript", cascade = CascadeType.ALL)
+    private List<Subject> subjects;
 }

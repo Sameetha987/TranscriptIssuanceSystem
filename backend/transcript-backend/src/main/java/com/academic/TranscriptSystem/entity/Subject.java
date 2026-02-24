@@ -15,11 +15,13 @@ public class Subject {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long transcriptId;
-
     private String code;
     private String name;
     private Integer credits;
     private Integer marks;
     private String grade;
+
+    @ManyToOne
+    @JoinColumn(name = "transcript_id", nullable = false)
+    private Transcript transcript;
 }

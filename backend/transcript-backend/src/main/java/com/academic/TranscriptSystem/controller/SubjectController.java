@@ -2,6 +2,8 @@ package com.academic.TranscriptSystem.controller;
 
 import com.academic.TranscriptSystem.dto.SubjectRequestDTO;
 import com.academic.TranscriptSystem.entity.Subject;
+import com.academic.TranscriptSystem.entity.Transcript;
+import com.academic.TranscriptSystem.repository.TranscriptRepository;
 import com.academic.TranscriptSystem.service.SubjectService;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,16 +14,22 @@ import java.util.List;
 public class SubjectController {
 
     private final SubjectService subjectService;
+    private final TranscriptRepository transcriptRepository;
+    public SubjectController(SubjectService subjectService,
+                             TranscriptRepository transcriptRepository) {
 
-    public SubjectController(SubjectService subjectService) {
         this.subjectService = subjectService;
+        this.transcriptRepository = transcriptRepository;
     }
-
     @PostMapping("/add")
     public Subject addSubject(@RequestBody SubjectRequestDTO dto) {
 
         Subject subject = new Subject();
-        subject.setTranscriptId(dto.getTranscriptId());
+        Transcript transcript = transcriptRepository
+                .findById(dto.getTranscriptId())
+                .orElseThrow(() -> new RuntimeException("Transcript not found"));
+
+        subject.setTranscript(transcript);
         subject.setCode(dto.getCode());
         subject.setName(dto.getName());
         subject.setCredits(dto.getCredits());

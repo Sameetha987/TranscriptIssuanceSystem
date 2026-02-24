@@ -2,81 +2,89 @@ package com.academic.TranscriptSystem.service.impl;
 
 import com.academic.TranscriptSystem.blockchain.service.BlockchainService;
 import com.academic.TranscriptSystem.dto.DashboardStatsDTO;
+import com.academic.TranscriptSystem.dto.IssueTranscriptDTO;
+import com.academic.TranscriptSystem.dto.SubjectRequestDTO;
+import com.academic.TranscriptSystem.entity.Student;
 import com.academic.TranscriptSystem.entity.Subject;
 import com.academic.TranscriptSystem.entity.Transcript;
-import com.academic.TranscriptSystem.repository.SubjectRepository;
+import com.academic.TranscriptSystem.repository.StudentRepository;
 import com.academic.TranscriptSystem.repository.TranscriptRepository;
 import com.academic.TranscriptSystem.security.HashUtil;
 import com.academic.TranscriptSystem.service.TranscriptService;
-import com.academic.TranscriptSystem.dto.IssueTranscriptDTO;
-import com.academic.TranscriptSystem.dto.SubjectRequestDTO;
 import jakarta.transaction.Transactional;
-import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
-
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class TranscriptServiceImpl implements TranscriptService {
 
     private final TranscriptRepository transcriptRepository;
+    private final StudentRepository studentRepository;
     private final BlockchainService blockchainService;
-    private final SubjectRepository subjectRepository;
+
     private static final Logger log = LoggerFactory.getLogger(TranscriptServiceImpl.class);
 
     public TranscriptServiceImpl(TranscriptRepository transcriptRepository,
-                                 BlockchainService blockchainService,
-                                 SubjectRepository subjectRepository) {
+                                 StudentRepository studentRepository,
+                                 BlockchainService blockchainService) {
 
         this.transcriptRepository = transcriptRepository;
+        this.studentRepository = studentRepository;
         this.blockchainService = blockchainService;
-        this.subjectRepository = subjectRepository;
     }
+
+    // ISSUE TRANSCRIPT
 
     @Override
     @Transactional
-    public Transcript issueTranscript(IssueTranscriptDTO request)  {
+    public Transcript issueTranscript(IssueTranscriptDTO request) {
+
+        // Find student by roll
+        Student student = studentRepository
+                .findByStudentRoll(request.getStudentRoll())
+                .orElseThrow(() -> new RuntimeException("Student not found"));
 
         //  Create transcript
         Transcript transcript = new Transcript();
-        transcript.setStudentId(request.getStudentId());
-        transcript.setStudentEmail(request.getStudentEmail());
-        transcript.setStudentName(request.getStudentName());
+        transcript.setStudent(student);
         transcript.setProgram(request.getProgram());
-        transcript.setDepartment(request.getDepartment());
         transcript.setSemester(request.getSemester());
         transcript.setCgpa(request.getCgpa());
 
-        transcript = transcriptRepository.save(transcript);
+        //  Add subjects (relationship-based)
+        List<Subject> subjectList = new ArrayList<>();
 
-        //  Save subjects
         for (SubjectRequestDTO s : request.getSubjects()) {
 
             Subject subject = new Subject();
-            subject.setTranscriptId(transcript.getId());
             subject.setCode(s.getCode());
             subject.setName(s.getName());
             subject.setCredits(s.getCredits());
             subject.setMarks(s.getMarks());
             subject.setGrade(s.getGrade());
 
-            subjectRepository.save(subject);
+            subject.setTranscript(transcript); // relationship
+            subjectList.add(subject);
         }
 
-        //  Build full hash INCLUDING subjects
+        transcript.setSubjects(subjectList);
+
+        // Save transcript + subjects (cascade handles subjects)
+        transcript = transcriptRepository.save(transcript);
+
+        // Build blockchain hash (student + transcript + subjects)
         StringBuilder dataBuilder = new StringBuilder();
 
-        dataBuilder.append(transcript.getStudentId());
-        dataBuilder.append(transcript.getStudentEmail());
+        dataBuilder.append(student.getId());
+        dataBuilder.append(student.getEmail());
         dataBuilder.append(transcript.getSemester());
         dataBuilder.append(transcript.getCgpa());
 
-        List<Subject> subjects =
-                subjectRepository.findByTranscriptId(transcript.getId());
-
-        for (Subject s : subjects) {
+        for (Subject s : transcript.getSubjects()) {
             dataBuilder.append(s.getCode());
             dataBuilder.append(s.getCredits());
             dataBuilder.append(s.getGrade());
@@ -101,30 +109,35 @@ public class TranscriptServiceImpl implements TranscriptService {
         return transcriptRepository.save(transcript);
     }
 
+    // GET ALL
+
     @Override
     public List<Transcript> getAllTranscripts() {
         return transcriptRepository.findAll();
     }
 
+    // GET BY STUDENT ID
+
     @Override
     public List<Transcript> getStudentTranscripts(Long studentId) {
-        return transcriptRepository.findByStudentId(studentId);
+        return transcriptRepository.findByStudent_Id(studentId);
     }
+
+    // GET BY ID
 
     @Override
     public Transcript getTranscriptById(Long transcriptId) {
         return transcriptRepository.findById(transcriptId).orElse(null);
     }
 
-    @Override
-    public List<Transcript> getTranscriptsByStudentEmail(String email) {
-        return transcriptRepository.findByStudentEmail(email);
-    }
+    // GET BY STUDENT EMAIL
 
     @Override
-    public long getTotalTranscripts() {
-        return transcriptRepository.count();
+    public List<Transcript> getTranscriptsByStudentEmail(String email) {
+        return transcriptRepository.findByStudent_Email(email);
     }
+
+    // DASHBOARD STATS
 
     @Override
     public DashboardStatsDTO getDashboardStats() {
@@ -149,18 +162,14 @@ public class TranscriptServiceImpl implements TranscriptService {
                                 t.getBlockchainRecordId()
                         );
 
-                //  Build full hash INCLUDING subjects
                 StringBuilder dataBuilder = new StringBuilder();
 
-                dataBuilder.append(t.getStudentId());
-                dataBuilder.append(t.getStudentEmail());
+                dataBuilder.append(t.getStudent().getId());
+                dataBuilder.append(t.getStudent().getEmail());
                 dataBuilder.append(t.getSemester());
                 dataBuilder.append(t.getCgpa());
 
-                List<Subject> subjects =
-                        subjectRepository.findByTranscriptId(t.getId());
-
-                for (Subject s : subjects) {
+                for (Subject s : t.getSubjects()) {
                     dataBuilder.append(s.getCode());
                     dataBuilder.append(s.getCredits());
                     dataBuilder.append(s.getGrade());
@@ -185,5 +194,8 @@ public class TranscriptServiceImpl implements TranscriptService {
 
         return new DashboardStatsDTO(total, authentic, tampered);
     }
-
+    @Override
+    public long getTotalTranscripts() {
+        return transcriptRepository.count();
+    }
 }

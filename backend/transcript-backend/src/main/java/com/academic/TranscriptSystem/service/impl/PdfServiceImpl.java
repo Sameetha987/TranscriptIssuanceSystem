@@ -56,10 +56,10 @@ public class PdfServiceImpl implements PdfService {
 
             /* ================= STUDENT DETAILS ================= */
 
-            document.add(new Paragraph("Student Name: " + transcript.getStudentName(), normalFont));
-            document.add(new Paragraph("Student Email: " + transcript.getStudentEmail(), normalFont));
+            document.add(new Paragraph("Student Name: " + transcript.getStudent().getName(), normalFont));
+            document.add(new Paragraph("Student Email: " + transcript.getStudent().getEmail(), normalFont));
             document.add(new Paragraph("Program: " + transcript.getProgram(), normalFont));
-            document.add(new Paragraph("Department: " + transcript.getDepartment(), normalFont));
+            document.add(new Paragraph("Department: " + transcript.getStudent().getDepartment(), normalFont));
             document.add(new Paragraph("Semester: " + transcript.getSemester(), normalFont));
             document.add(new Paragraph("CGPA: " + transcript.getCgpa(), boldFont));
             document.add(new Paragraph("Blockchain TxId: " + transcript.getBlockchainTxId(), normalFont));

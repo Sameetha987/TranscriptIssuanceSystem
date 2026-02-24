@@ -5,7 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface TranscriptRepository extends JpaRepository<Transcript, Long> {
-    List<Transcript> findByStudentId(Long studentId);
 
-    List<Transcript> findByStudentEmail(String email);
+    List<Transcript> findByStudent_Id(Long studentId);
+
+    List<Transcript> findByStudent_Email(String email);
 }

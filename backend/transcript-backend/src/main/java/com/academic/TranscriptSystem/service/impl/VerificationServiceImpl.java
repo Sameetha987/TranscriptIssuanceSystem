@@ -40,7 +40,7 @@ public class VerificationServiceImpl implements VerificationService {
         if (transcript.getBlockchainRecordId() == null) {
             return new TranscriptVerificationResponseDTO(
                     transcriptId,
-                    transcript.getStudentEmail(),
+                    transcript.getStudent().getEmail(),
                     "BLOCKCHAIN_NOT_FOUND",
                     null
             );
@@ -61,15 +61,15 @@ public class VerificationServiceImpl implements VerificationService {
 
             return new TranscriptVerificationResponseDTO(
                     transcriptId,
-                    transcript.getStudentEmail(),
+                    transcript.getStudent().getEmail(),
                     "BLOCKCHAIN_ERROR",
                     null
             );
         }
 
         String dataToHash =
-                transcript.getStudentId() +
-                        transcript.getStudentEmail() +
+                transcript.getStudent().getId() +
+                        transcript.getStudent().getEmail() +
                         transcript.getSemester() +
                         transcript.getCgpa();
 
@@ -92,7 +92,7 @@ public class VerificationServiceImpl implements VerificationService {
 
         return new TranscriptVerificationResponseDTO(
                 transcriptId,
-                transcript.getStudentEmail(),
+                transcript.getStudent().getEmail(),
                 status,
                 qrCodeBase64
         );

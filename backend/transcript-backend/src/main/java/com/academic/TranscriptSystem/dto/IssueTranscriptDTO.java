@@ -4,33 +4,15 @@ import java.util.List;
 
 public class IssueTranscriptDTO {
 
-    private Long studentId;
-    private String studentEmail;
-    private String studentName;
+    private String studentRoll;   //
     private String program;
 
-    public Long getStudentId() {
-        return studentId;
+    public String getStudentRoll() {
+        return studentRoll;
     }
 
-    public void setStudentId(Long studentId) {
-        this.studentId = studentId;
-    }
-
-    public String getStudentEmail() {
-        return studentEmail;
-    }
-
-    public void setStudentEmail(String studentEmail) {
-        this.studentEmail = studentEmail;
-    }
-
-    public String getStudentName() {
-        return studentName;
-    }
-
-    public void setStudentName(String studentName) {
-        this.studentName = studentName;
+    public void setStudentRoll(String studentRoll) {
+        this.studentRoll = studentRoll;
     }
 
     public String getProgram() {
@@ -39,14 +21,6 @@ public class IssueTranscriptDTO {
 
     public void setProgram(String program) {
         this.program = program;
-    }
-
-    public String getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(String department) {
-        this.department = department;
     }
 
     public Integer getSemester() {
@@ -73,11 +47,9 @@ public class IssueTranscriptDTO {
         this.subjects = subjects;
     }
 
-    private String department;
     private Integer semester;
     private Double cgpa;
 
     private List<SubjectRequestDTO> subjects;
 
-    // getters & setters
 }
