@@ -23,11 +23,12 @@ public class SecurityConfig {
                 .cors(cors -> {})
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/transcripts/public/**").permitAll()
                         .requestMatchers("/api/transcripts/issue").hasRole("ADMIN")
                         .requestMatchers("/api/transcripts/student/**").hasAnyRole("ADMIN","STUDENT")
                         .requestMatchers("/api/transcripts/my").hasRole("STUDENT")
-                        .requestMatchers("/api/transcripts/public/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter,

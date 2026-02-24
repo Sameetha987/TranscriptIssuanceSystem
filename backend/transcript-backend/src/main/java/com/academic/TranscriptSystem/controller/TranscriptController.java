@@ -1,5 +1,6 @@
 package com.academic.TranscriptSystem.controller;
 
+import com.academic.TranscriptSystem.dto.IssueTranscriptDTO;
 import com.academic.TranscriptSystem.dto.VerificationResponseDTO;
 import com.academic.TranscriptSystem.entity.Transcript;
 import com.academic.TranscriptSystem.service.PdfService;
@@ -38,21 +39,11 @@ public class TranscriptController {
 
     // Issue Transcript
     @PostMapping("/issue")
-    public ApiResponse<Transcript> issueTranscript(@Valid @RequestBody TranscriptRequestDTO request) {
+    public ApiResponse<Transcript> issueTranscript(@RequestBody IssueTranscriptDTO request) {
 
-        Transcript transcript = new Transcript();
-        transcript.setStudentId(request.getStudentId());
-        transcript.setStudentEmail(request.getStudentEmail());
-        transcript.setStudentName(request.getStudentName());
-        transcript.setProgram(request.getProgram());
-        transcript.setDepartment(request.getDepartment());
-        transcript.setSemester(request.getSemester());
-        transcript.setCgpa(request.getCgpa());
-        transcript.setBlockchainHash("pending");
+        Transcript transcript = transcriptService.issueTranscript(request);
 
-        Transcript saved = transcriptService.issueTranscript(transcript);
-
-        return new ApiResponse<>(true, "Transcript issued successfully", saved);
+        return new ApiResponse<>(true, "Transcript issued successfully", transcript);
     }
     @GetMapping
     public List<Transcript> getAllTranscripts() {
@@ -104,6 +95,10 @@ public class TranscriptController {
 
         return verificationService.verifyTranscript(id);
 
+    }
+    @GetMapping("/stats")
+    public long getTotalTranscripts() {
+        return transcriptService.getTotalTranscripts();
     }
 
 

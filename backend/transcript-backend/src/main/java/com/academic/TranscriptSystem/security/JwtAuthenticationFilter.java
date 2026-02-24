@@ -21,7 +21,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public JwtAuthenticationFilter(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
     }
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
 
+        String path = request.getServletPath();
+
+        return path.startsWith("/api/auth")
+                || path.startsWith("/api/transcripts/public");
+    }
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
