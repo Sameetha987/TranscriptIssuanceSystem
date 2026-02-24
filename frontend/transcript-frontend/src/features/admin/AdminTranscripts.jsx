@@ -67,9 +67,23 @@ const AdminTranscripts = () => {
   };
 
   if (loading) {
-    return <div className="flex justify-center py-10">
-             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-blue-800"></div>
-           </div>;
+    return (
+      <div className="flex justify-center items-center py-20">
+        <div className="w-10 h-10 border-4 border-blue-800 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+  if (!loading && transcripts.length === 0) {
+    return (
+      <div className="bg-white rounded-xl shadow-md p-10 text-center">
+        <h2 className="text-xl font-semibold text-slate-700">
+          No Transcripts Yet
+        </h2>
+        <p className="text-slate-500 mt-2">
+          Issue a transcript to see it listed here.
+        </p>
+      </div>
+    );
   }
 
   return (

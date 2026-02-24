@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "../../api/axios";
+import toast from "react-hot-toast";
 
 const gradePointsMap = {
   O: 10,
@@ -101,9 +102,10 @@ const IssueTranscript = () => {
       const response = await axios.post("/api/transcripts/issue", payload);
 
       setResult(response.data.data);
+      toast.success("Transcript issued successfully");
 
     } catch (error) {
-      alert("Failed to issue transcript");
+      toast.error("Failed to issue transcript");
     } finally {
       setLoading(false);
     }
@@ -209,9 +211,13 @@ const IssueTranscript = () => {
 
         <button
           onClick={handleSubmit}
-          className="bg-blue-800 hover:bg-blue-900 text-white px-6 py-3 rounded-lg transition"
+          disabled={loading}
+          className="bg-blue-800 hover:bg-blue-900 text-white px-6 py-3 rounded-lg transition flex items-center justify-center gap-2"
         >
-          {loading ? "Processing..." : "Issue Transcript"}
+          {loading && (
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          )}
+          {loading ? "Issuing..." : "Issue Transcript"}
         </button>
 
       </div>
