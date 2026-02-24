@@ -1,8 +1,10 @@
 package com.academic.TranscriptSystem.service;
 
+import com.academic.TranscriptSystem.dto.DashboardStatsDTO;
 import com.academic.TranscriptSystem.dto.IssueTranscriptDTO;
 import com.academic.TranscriptSystem.entity.Transcript;
 import java.util.List;
+
 
 public interface TranscriptService {
 
@@ -18,4 +20,5 @@ public interface TranscriptService {
     List<Transcript> getTranscriptsByStudentEmail(String email);
     long getTotalTranscripts();
 
+    DashboardStatsDTO getDashboardStats();
 }

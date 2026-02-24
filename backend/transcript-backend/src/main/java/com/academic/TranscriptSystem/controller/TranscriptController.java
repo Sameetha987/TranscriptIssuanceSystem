@@ -1,14 +1,11 @@
 package com.academic.TranscriptSystem.controller;
 
-import com.academic.TranscriptSystem.dto.IssueTranscriptDTO;
-import com.academic.TranscriptSystem.dto.VerificationResponseDTO;
+import com.academic.TranscriptSystem.dto.*;
 import com.academic.TranscriptSystem.entity.Transcript;
 import com.academic.TranscriptSystem.service.PdfService;
 import com.academic.TranscriptSystem.service.TranscriptService;
 import com.academic.TranscriptSystem.response.ApiResponse;
-import com.academic.TranscriptSystem.dto.TranscriptRequestDTO;
 import org.springframework.security.core.Authentication;
-import com.academic.TranscriptSystem.dto.TranscriptVerificationResponseDTO;
 import com.academic.TranscriptSystem.service.VerificationService;
 import com.academic.TranscriptSystem.service.PdfService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -96,11 +93,10 @@ public class TranscriptController {
         return verificationService.verifyTranscript(id);
 
     }
-    @GetMapping("/stats")
-    public long getTotalTranscripts() {
-        return transcriptService.getTotalTranscripts();
+    @GetMapping("/dashboard")
+    public DashboardStatsDTO getDashboardStats() {
+        return transcriptService.getDashboardStats();
     }
-
 
 }
 

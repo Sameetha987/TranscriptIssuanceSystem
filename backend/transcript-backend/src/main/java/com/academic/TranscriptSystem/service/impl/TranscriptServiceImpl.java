@@ -1,6 +1,7 @@
 package com.academic.TranscriptSystem.service.impl;
 
 import com.academic.TranscriptSystem.blockchain.service.BlockchainService;
+import com.academic.TranscriptSystem.dto.DashboardStatsDTO;
 import com.academic.TranscriptSystem.entity.Subject;
 import com.academic.TranscriptSystem.entity.Transcript;
 import com.academic.TranscriptSystem.repository.SubjectRepository;
@@ -13,6 +14,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 import java.util.List;
 
@@ -37,7 +39,7 @@ public class TranscriptServiceImpl implements TranscriptService {
     @Transactional
     public Transcript issueTranscript(IssueTranscriptDTO request)  {
 
-        // 1️⃣ Create transcript
+        //  Create transcript
         Transcript transcript = new Transcript();
         transcript.setStudentId(request.getStudentId());
         transcript.setStudentEmail(request.getStudentEmail());
@@ -49,7 +51,7 @@ public class TranscriptServiceImpl implements TranscriptService {
 
         transcript = transcriptRepository.save(transcript);
 
-        // 2️⃣ Save subjects
+        //  Save subjects
         for (SubjectRequestDTO s : request.getSubjects()) {
 
             Subject subject = new Subject();
@@ -63,7 +65,7 @@ public class TranscriptServiceImpl implements TranscriptService {
             subjectRepository.save(subject);
         }
 
-        // 3️⃣ Build full hash INCLUDING subjects
+        //  Build full hash INCLUDING subjects
         StringBuilder dataBuilder = new StringBuilder();
 
         dataBuilder.append(transcript.getStudentId());
@@ -83,7 +85,7 @@ public class TranscriptServiceImpl implements TranscriptService {
         String hash = HashUtil.generateHash(dataBuilder.toString());
         transcript.setBlockchainHash(hash);
 
-        // 4️⃣ Store on blockchain
+        //  Store on blockchain
         try {
             String txId = blockchainService.storeHash(hash);
             transcript.setBlockchainTxId(txId);
@@ -124,5 +126,64 @@ public class TranscriptServiceImpl implements TranscriptService {
         return transcriptRepository.count();
     }
 
+    @Override
+    public DashboardStatsDTO getDashboardStats() {
+
+        List<Transcript> transcripts = transcriptRepository.findAll();
+
+        long total = transcripts.size();
+        long authentic = 0;
+        long tampered = 0;
+
+        for (Transcript t : transcripts) {
+
+            try {
+
+                if (t.getBlockchainRecordId() == null) {
+                    tampered++;
+                    continue;
+                }
+
+                String blockchainHash =
+                        blockchainService.getHashFromBlockchain(
+                                t.getBlockchainRecordId()
+                        );
+
+                //  Build full hash INCLUDING subjects
+                StringBuilder dataBuilder = new StringBuilder();
+
+                dataBuilder.append(t.getStudentId());
+                dataBuilder.append(t.getStudentEmail());
+                dataBuilder.append(t.getSemester());
+                dataBuilder.append(t.getCgpa());
+
+                List<Subject> subjects =
+                        subjectRepository.findByTranscriptId(t.getId());
+
+                for (Subject s : subjects) {
+                    dataBuilder.append(s.getCode());
+                    dataBuilder.append(s.getCredits());
+                    dataBuilder.append(s.getGrade());
+                }
+
+                String recalculated =
+                        HashUtil.generateHash(dataBuilder.toString());
+
+                if (blockchainHash != null &&
+                        blockchainHash.equals(recalculated)) {
+
+                    authentic++;
+
+                } else {
+                    tampered++;
+                }
+
+            } catch (Exception e) {
+                tampered++;
+            }
+        }
+
+        return new DashboardStatsDTO(total, authentic, tampered);
+    }
 
 }
