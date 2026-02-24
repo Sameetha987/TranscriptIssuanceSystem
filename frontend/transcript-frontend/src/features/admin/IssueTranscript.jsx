@@ -94,20 +94,11 @@ const IssueTranscript = () => {
 
       const payload = {
         ...studentDetails,
-        cgpa
+        cgpa,
+        subjects: subjects
       };
 
       const response = await axios.post("/api/transcripts/issue", payload);
-
-      const transcriptId = response.data.data.id;
-
-      // Save subjects one by one
-      for (const subject of subjects) {
-        await axios.post("/api/subjects/add", {
-          transcriptId,
-          ...subject
-        });
-      }
 
       setResult(response.data.data);
 
@@ -117,7 +108,6 @@ const IssueTranscript = () => {
       setLoading(false);
     }
   };
-
   return (
     <div>
 

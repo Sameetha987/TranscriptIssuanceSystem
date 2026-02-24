@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import axios from "../../api/axios";
 import StatusBadge from "../../components/StatusBadge";
+import { useNavigate } from "react-router-dom";
 
 const AdminTranscripts = () => {
 
   const [transcripts, setTranscripts] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [verificationMap, setVerificationMap] = useState({});
+  const navigate = useNavigate();
   useEffect(() => {
     fetchTranscripts();
   }, []);
@@ -35,7 +37,28 @@ const AdminTranscripts = () => {
   const fetchTranscripts = async () => {
     try {
       const response = await axios.get("/api/transcripts");
-      setTranscripts(response.data);
+      const data = response.data;
+      setTranscripts(data);
+
+      // Verify each transcript
+      const verificationResults = {};
+
+      for (let t of data) {
+        try {
+          const verifyRes = await axios.get(
+            `/api/transcripts/verify/${t.id}`
+          );
+
+          verificationResults[t.id] =
+            verifyRes.data.data.status;
+
+        } catch {
+          verificationResults[t.id] = "BLOCKCHAIN_ERROR";
+        }
+      }
+
+      setVerificationMap(verificationResults);
+
     } catch (error) {
       console.error("Error fetching transcripts", error);
     } finally {
@@ -89,11 +112,7 @@ const AdminTranscripts = () => {
                 <td className="px-6 py-4">{t.semester}</td>
                 <td className="px-6 py-4">{t.cgpa}</td>
                 <td className="px-6 py-4">
-                  <StatusBadge
-                    status={
-                      t.blockchainHash ? "AUTHENTIC" : "PENDING"
-                    }
-                  />
+                  <StatusBadge status={verificationMap[t.id]} />
                 </td>
                 <td className="px-6 py-4 space-x-2">
 
@@ -109,6 +128,13 @@ const AdminTranscripts = () => {
                     className="px-3 py-1 text-sm bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition"
                   >
                     Verify
+                  </button>
+
+                  <button
+                    onClick={() => navigate(`/admin/transcripts/${t.id}`)}
+                    className="px-3 py-1 text-sm bg-slate-800 text-white rounded-md hover:bg-slate-900 transition"
+                  >
+                    View
                   </button>
 
                 </td>
