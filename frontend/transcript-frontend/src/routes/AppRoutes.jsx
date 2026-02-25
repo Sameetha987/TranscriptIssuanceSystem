@@ -8,6 +8,8 @@ import IssueTranscript from "../features/admin/IssueTranscript";
 import Dashboard from "../features/admin/Dashboard";
 import TranscriptDetail from "../features/admin/TranscriptDetail";
 import AdminCreateStudent from "../features/admin/AdminCreateStudent";
+import AdminStudentList from "../features/admin/AdminStudentList";
+import AdminStudentProfile from "../features/admin/AdminStudentProfile";
 
 const AppRoutes = () => {
   return (
@@ -25,6 +27,8 @@ const AppRoutes = () => {
         >
           <Route index element={<Dashboard />} />
           <Route path="/admin/students/create" element={<AdminCreateStudent />} />
+          <Route path="/admin/students" element={<AdminStudentList />} />
+          <Route path="/admin/students/:id" element={<AdminStudentProfile />} />
           <Route path="issue" element={<IssueTranscript />} />
           <Route path="transcripts" element={<AdminTranscripts />} />
           <Route path="transcripts/:id" element={<TranscriptDetail />} />
