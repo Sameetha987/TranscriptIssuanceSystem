@@ -33,6 +33,13 @@ const AdminLayout = () => {
           </Link>
 
           <Link
+            to="/admin/students/create"
+            className="block px-3 py-2 rounded-lg hover:bg-slate-800 hover:text-white transition"
+          >
+            Create Student
+          </Link>
+
+          <Link
             to="/admin/issue"
             className="block px-3 py-2 rounded-lg hover:bg-slate-800 hover:text-white transition"
           >

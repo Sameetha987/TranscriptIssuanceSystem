@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "../../api/axios";
 import StatusBadge from "../../components/StatusBadge";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const AdminTranscripts = () => {
 
@@ -31,6 +32,20 @@ const AdminTranscripts = () => {
       link.remove();
     } catch (error) {
       console.error("PDF download failed", error);
+    }
+  };
+
+  const reVerify = async (id) => {
+    try {
+      const res = await axios.get(`/api/transcripts/verify/${id}`);
+      setVerificationMap(prev => ({
+        ...prev,
+        [id]: res.data.data.status
+      }));
+
+      toast.success("Verification updated");
+    } catch {
+      toast.error("Verification failed");
     }
   };
 
@@ -142,6 +157,13 @@ const AdminTranscripts = () => {
                     className="px-3 py-1 text-sm bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition"
                   >
                     Verify
+                  </button>
+
+                  <button
+                    onClick={() => reVerify(t.id)}
+                    className="px-3 py-1 text-sm bg-emerald-700 text-white rounded-md hover:bg-emerald-800 transition"
+                  >
+                    Re-Verify
                   </button>
 
                   <button

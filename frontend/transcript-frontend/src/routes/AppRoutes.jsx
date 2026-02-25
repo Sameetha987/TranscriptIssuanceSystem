@@ -7,6 +7,7 @@ import AdminTranscripts from "../features/admin/AdminTranscripts";
 import IssueTranscript from "../features/admin/IssueTranscript";
 import Dashboard from "../features/admin/Dashboard";
 import TranscriptDetail from "../features/admin/TranscriptDetail";
+import AdminCreateStudent from "../features/admin/AdminCreateStudent";
 
 const AppRoutes = () => {
   return (
@@ -23,6 +24,7 @@ const AppRoutes = () => {
           }
         >
           <Route index element={<Dashboard />} />
+          <Route path="/admin/students/create" element={<AdminCreateStudent />} />
           <Route path="issue" element={<IssueTranscript />} />
           <Route path="transcripts" element={<AdminTranscripts />} />
           <Route path="transcripts/:id" element={<TranscriptDetail />} />
