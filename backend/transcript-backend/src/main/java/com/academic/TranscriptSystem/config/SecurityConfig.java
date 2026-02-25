@@ -25,6 +25,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/transcripts/public/**").permitAll()
                         .requestMatchers("/api/transcripts/issue").hasRole("ADMIN")
                         .requestMatchers("/api/transcripts/student/**").hasAnyRole("ADMIN","STUDENT")
