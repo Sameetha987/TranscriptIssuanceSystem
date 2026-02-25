@@ -8,6 +8,8 @@ import jakarta.validation.Valid;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/admin/students")
 public class AdminStudentController {
@@ -41,5 +43,22 @@ public class AdminStudentController {
 
         return new ApiResponse<>(true, "Student created successfully",
                 studentRepository.save(student));
+    }
+    @GetMapping("/all")
+    public ApiResponse<List<Student>> getAllStudents() {
+        return new ApiResponse<>(
+                true,
+                "Students fetched",
+                studentRepository.findAll()
+        );
+    }
+    @GetMapping("/{id}")
+    public ApiResponse<Student> getStudentById(@PathVariable Long id) {
+
+        return new ApiResponse<>(
+                true,
+                "Student fetched",
+                studentRepository.findById(id).orElse(null)
+        );
     }
 }
