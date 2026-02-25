@@ -11,20 +11,27 @@ const AdminStudentProfile = () => {
 
   useEffect(() => {
     fetchStudent();
-    fetchTranscripts();
   }, []);
 
   const fetchStudent = async () => {
-    const res = await axios.get(`/api/admin/students/${id}`);
-    setStudent(res.data.data);
+    try {
+      const res = await axios.get(`/api/admin/students/${id}`);
+      const data = res.data.data;
+
+      setStudent(data);
+      setTranscripts(data.transcripts || []);
+    } catch (err) {
+      console.error("Failed to fetch student", err);
+    }
   };
 
-  const fetchTranscripts = async () => {
-    const res = await axios.get(`/api/transcripts/student/${id}`);
-    setTranscripts(res.data);
-  };
-
-  if (!student) return null;
+  if (!student) {
+    return (
+      <div className="flex justify-center py-20 text-slate-500">
+        Loading student profile...
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -100,10 +107,23 @@ const AdminStudentProfile = () => {
                 )}
 
                 <button
-                  onClick={() => window.open(
-                    `http://localhost:8080/api/transcripts/${t.id}/pdf`,
-                    "_blank"
-                  )}
+                  onClick={async () => {
+                    try {
+                      const res = await axios.get(
+                        `/api/transcripts/${t.id}/pdf`,
+                        { responseType: "blob" }
+                      );
+
+                      const url = window.URL.createObjectURL(new Blob([res.data]));
+                      const link = document.createElement("a");
+                      link.href = url;
+                      link.setAttribute("download", `transcript_${t.id}.pdf`);
+                      document.body.appendChild(link);
+                      link.click();
+                    } catch (err) {
+                      console.error("Failed to download PDF", err);
+                    }
+                  }}
                   className="bg-blue-800 text-white px-4 py-2 rounded-lg hover:bg-blue-900 transition"
                 >
                   PDF

@@ -57,10 +57,9 @@ public class TranscriptController {
     }
 
     // Get Transcript by ID
-    @GetMapping("/{id}")
-    public Transcript getTranscriptById(@PathVariable Long id) {
-
-        return transcriptService.getTranscriptById(id);
+    @GetMapping("/student/{id}")
+    public List<Transcript> getStudentTranscripts(@PathVariable Long id) {
+        return transcriptService.getTranscriptsByStudentId(id);
     }
 
     @GetMapping("/verify/{id}")

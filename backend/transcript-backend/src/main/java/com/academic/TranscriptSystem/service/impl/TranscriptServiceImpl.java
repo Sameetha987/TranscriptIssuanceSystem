@@ -47,7 +47,17 @@ public class TranscriptServiceImpl implements TranscriptService {
         Student student = studentRepository
                 .findByStudentRoll(request.getStudentRoll())
                 .orElseThrow(() -> new RuntimeException("Student not found"));
+        boolean exists = transcriptRepository
+                .existsByStudent_StudentRollAndSemester(
+                        request.getStudentRoll(),
+                        request.getSemester()
+                );
 
+        if (exists) {
+            throw new RuntimeException(
+                    "Transcript already exists for this student and semester"
+            );
+        }
         //  Create transcript
         Transcript transcript = new Transcript();
         transcript.setStudent(student);
@@ -119,15 +129,8 @@ public class TranscriptServiceImpl implements TranscriptService {
     // GET BY STUDENT ID
 
     @Override
-    public List<Transcript> getStudentTranscripts(Long studentId) {
+    public List<Transcript> getTranscriptsByStudentId(Long studentId) {
         return transcriptRepository.findByStudent_Id(studentId);
-    }
-
-    // GET BY ID
-
-    @Override
-    public Transcript getTranscriptById(Long transcriptId) {
-        return transcriptRepository.findById(transcriptId).orElse(null);
     }
 
     // GET BY STUDENT EMAIL

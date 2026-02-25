@@ -1,6 +1,8 @@
 package com.academic.TranscriptSystem.controller;
 
 import com.academic.TranscriptSystem.dto.StudentDTO;
+import com.academic.TranscriptSystem.dto.StudentProfileDTO;
+import com.academic.TranscriptSystem.dto.TranscriptSummaryDTO;
 import com.academic.TranscriptSystem.entity.Student;
 import com.academic.TranscriptSystem.repository.StudentRepository;
 import com.academic.TranscriptSystem.response.ApiResponse;
@@ -53,12 +55,30 @@ public class AdminStudentController {
         );
     }
     @GetMapping("/{id}")
-    public ApiResponse<Student> getStudentById(@PathVariable Long id) {
+    public ApiResponse<StudentProfileDTO> getStudentById(@PathVariable Long id) {
 
-        return new ApiResponse<>(
-                true,
-                "Student fetched",
-                studentRepository.findById(id).orElse(null)
-        );
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+
+        StudentProfileDTO dto = new StudentProfileDTO();
+        dto.setId(student.getId());
+        dto.setStudentRoll(student.getStudentRoll());
+        dto.setName(student.getName());
+        dto.setEmail(student.getEmail());
+        dto.setDepartment(student.getDepartment());
+
+        List<TranscriptSummaryDTO> transcriptDTOs =
+                student.getTranscripts().stream().map(t -> {
+                    TranscriptSummaryDTO tdto = new TranscriptSummaryDTO();
+                    tdto.setId(t.getId());
+                    tdto.setSemester(t.getSemester());
+                    tdto.setCgpa(t.getCgpa());
+                    tdto.setBlockchainRecordId(t.getBlockchainRecordId());
+                    return tdto;
+                }).toList();
+
+        dto.setTranscripts(transcriptDTOs);
+
+        return new ApiResponse<>(true, "Student fetched", dto);
     }
 }

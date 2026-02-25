@@ -12,11 +12,10 @@ public interface TranscriptService {
     Transcript issueTranscript(IssueTranscriptDTO request);
 
     // Get all transcripts of a student
-    List<Transcript> getStudentTranscripts(Long studentId);
+    List<Transcript> getTranscriptsByStudentId(Long studentId);
     //Fetch all transcripts
     List<Transcript> getAllTranscripts();
-    // Get transcript by ID
-    Transcript getTranscriptById(Long transcriptId);
+    // Get transcript by email ID
     List<Transcript> getTranscriptsByStudentEmail(String email);
     long getTotalTranscripts();
 

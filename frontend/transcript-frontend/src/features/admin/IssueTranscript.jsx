@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "../../api/axios";
 import toast from "react-hot-toast";
 
@@ -26,14 +26,16 @@ const getGradeFromMarks = (marks) => {
 
 const IssueTranscript = () => {
 
-  const [studentDetails, setStudentDetails] = useState({
-    studentId: "",
-    studentEmail: "",
-    studentName: "",
+  const [form, setForm] = useState({
+    studentRoll: "",
     program: "",
-    department: "",
     semester: ""
   });
+
+  const [students, setStudents] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const [subjects, setSubjects] = useState([
     { code: "", name: "", credits: "", marks: "", grade: "O" }
@@ -42,10 +44,37 @@ const IssueTranscript = () => {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  const fetchStudents = async () => {
+    try {
+      const res = await axios.get("/api/admin/students/all");
+      setStudents(res.data.data);
+    } catch (err) {
+      console.error("Failed to fetch students");
+    }
+  };
+
+  const filteredStudents = students.filter((s) =>
+    s.studentRoll.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleSelectStudent = (student) => {
+    setSelectedStudent(student);
+    setSearchTerm(student.studentRoll);
+    setShowSuggestions(false);
+
+    setForm({
+      ...form,
+      studentRoll: student.studentRoll
+    });
+  };
   // Handle student input
-  const handleStudentChange = (e) => {
-    setStudentDetails({
-      ...studentDetails,
+  const handleFormChange = (e) => {
+    setForm({
+      ...form,
       [e.target.name]: e.target.value
     });
   };
@@ -54,7 +83,16 @@ const IssueTranscript = () => {
  const handleSubjectChange = (index, e) => {
    const updated = [...subjects];
    updated[index][e.target.name] = e.target.value;
+   if (name === "code") {
+     const duplicate = subjects.some(
+       (s, i) => s.code === value && i !== index
+     );
 
+     if (duplicate) {
+       toast.error("Subject code must be unique");
+       return;
+     }
+   }
    if (e.target.name === "marks") {
      updated[index].grade = getGradeFromMarks(Number(e.target.value));
    }
@@ -94,13 +132,16 @@ const IssueTranscript = () => {
       const cgpa = calculateCGPA();
 
       const payload = {
-        ...studentDetails,
+        ...form,
         cgpa,
-        subjects: subjects
+        subjects
       };
 
       const response = await axios.post("/api/transcripts/issue", payload);
-
+      if (!form.studentRoll) {
+        toast.error("Please select a student");
+        return;
+      }
       setResult(response.data.data);
       toast.success("Transcript issued successfully");
 
@@ -126,20 +167,111 @@ const IssueTranscript = () => {
 
         {/* Student Details */}
         <div>
-          <h2 className="text-lg font-semibold mb-4 text-slate-700">
+          <h2 className="text-lg font-semibold mb-6 text-slate-700">
             Student Details
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {Object.keys(studentDetails).map((key) => (
+
+            {/* Roll Number Search */}
+            <div className="relative">
+              <label className="block text-sm font-medium text-slate-600 mb-1">
+                Roll Number
+              </label>
+
               <input
-                key={key}
-                name={key}
-                placeholder={key}
-                className="p-3 border rounded-lg"
-                onChange={handleStudentChange}
+                type="text"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setShowSuggestions(true);
+                }}
+                placeholder="Type Roll Number..."
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-800"
               />
-            ))}
+
+              {showSuggestions && searchTerm && (
+                <div className="absolute z-10 bg-white border rounded-lg shadow-lg w-full mt-1 max-h-48 overflow-y-auto">
+                  {filteredStudents.map((s) => (
+                    <div
+                      key={s.id}
+                      onClick={() => handleSelectStudent(s)}
+                      className="p-3 hover:bg-slate-100 cursor-pointer"
+                    >
+                      {s.studentRoll}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Student Name */}
+            <div>
+              <label className="block text-sm font-medium text-slate-600 mb-1">
+                Name
+              </label>
+
+              <input
+                value={selectedStudent?.name || ""}
+                readOnly
+                className="w-full p-3 border rounded-lg bg-slate-100"
+              />
+            </div>
+
+            {/* Department */}
+            <div>
+              <label className="block text-sm font-medium text-slate-600 mb-1">
+                Department
+              </label>
+
+              <input
+                value={selectedStudent?.department || ""}
+                readOnly
+                className="w-full p-3 border rounded-lg bg-slate-100"
+              />
+            </div>
+
+            {/* Program */}
+            <div>
+              <label className="block text-sm font-medium text-slate-600 mb-1">
+                Program
+              </label>
+
+              <select
+                name="program"
+                value={form.program}
+                onChange={handleFormChange}
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-800"
+                required
+              >
+                <option value="">Select Program</option>
+                <option value="B.E">B.E</option>
+                <option value="B.Tech">B.Tech</option>
+              </select>
+            </div>
+
+            {/* Semester */}
+            <div>
+              <label className="block text-sm font-medium text-slate-600 mb-1">
+                Semester
+              </label>
+
+              <select
+                name="semester"
+                value={form.semester}
+                onChange={handleFormChange}
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-800"
+                required
+              >
+                <option value="">Select Semester</option>
+                {[1,2,3,4,5,6,7,8].map((sem) => (
+                  <option key={sem} value={sem}>
+                    Semester {sem}
+                  </option>
+                ))}
+              </select>
+            </div>
+
           </div>
         </div>
 
@@ -156,35 +288,35 @@ const IssueTranscript = () => {
                 <input
                   name="code"
                   placeholder="Code"
-                  className="p-3 border rounded-lg"
+                  className="w-full p-3 border rounded-lg"
                   onChange={(e) => handleSubjectChange(index, e)}
                 />
 
                 <input
                   name="name"
                   placeholder="Name"
-                  className="p-3 border rounded-lg"
+                  className="w-full p-3 border rounded-lg"
                   onChange={(e) => handleSubjectChange(index, e)}
                 />
 
                 <input
                   name="credits"
                   placeholder="Credits"
-                  className="p-3 border rounded-lg"
+                  className="w-full p-3 border rounded-lg"
                   onChange={(e) => handleSubjectChange(index, e)}
                 />
 
                 <input
                   name="marks"
                   placeholder="Marks"
-                  className="p-3 border rounded-lg"
+                  className="w-full p-3 border rounded-lg"
                   onChange={(e) => handleSubjectChange(index, e)}
                 />
 
                 <input
                   value={s.grade || ""}
                   readOnly
-                  className="p-3 border rounded-lg bg-gray-100 font-semibold"
+                  className="w-full p-3 border rounded-lg bg-gray-100 font-semibold"
                 />
 
               </div>
