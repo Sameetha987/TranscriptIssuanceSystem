@@ -57,9 +57,9 @@ public class TranscriptController {
     }
 
     // Get Transcript by ID
-    @GetMapping("/student/{id}")
-    public List<Transcript> getStudentTranscripts(@PathVariable Long id) {
-        return transcriptService.getTranscriptsByStudentId(id);
+    @GetMapping("/{id}")
+    public TranscriptDetailDTO getTranscript(@PathVariable Long id) {
+        return transcriptService.getTranscriptById(id);
     }
 
     @GetMapping("/verify/{id}")
@@ -96,7 +96,12 @@ public class TranscriptController {
     public DashboardStatsDTO getDashboardStats() {
         return transcriptService.getDashboardStats();
     }
+    @DeleteMapping("/{id}")
+    public ApiResponse<String> deleteTranscript(@PathVariable Long id) {
 
+        transcriptService.deleteTranscript(id);
+        return new ApiResponse<>(true, "Transcript archived", null);
+    }
 }
 
 

@@ -1,5 +1,6 @@
 package com.academic.TranscriptSystem.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,5 +24,6 @@ public class Subject {
 
     @ManyToOne
     @JoinColumn(name = "transcript_id", nullable = false)
+    @JsonIgnore
     private Transcript transcript;
 }

@@ -4,6 +4,7 @@ import com.academic.TranscriptSystem.blockchain.service.BlockchainService;
 import com.academic.TranscriptSystem.dto.DashboardStatsDTO;
 import com.academic.TranscriptSystem.dto.IssueTranscriptDTO;
 import com.academic.TranscriptSystem.dto.SubjectRequestDTO;
+import com.academic.TranscriptSystem.dto.TranscriptDetailDTO;
 import com.academic.TranscriptSystem.entity.Student;
 import com.academic.TranscriptSystem.entity.Subject;
 import com.academic.TranscriptSystem.entity.Transcript;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -48,7 +50,7 @@ public class TranscriptServiceImpl implements TranscriptService {
                 .findByStudentRoll(request.getStudentRoll())
                 .orElseThrow(() -> new RuntimeException("Student not found"));
         boolean exists = transcriptRepository
-                .existsByStudent_StudentRollAndSemester(
+                .existsByStudent_StudentRollAndSemesterAndActiveTrue(
                         request.getStudentRoll(),
                         request.getSemester()
                 );
@@ -94,12 +96,16 @@ public class TranscriptServiceImpl implements TranscriptService {
         dataBuilder.append(transcript.getSemester());
         dataBuilder.append(transcript.getCgpa());
 
-        for (Subject s : transcript.getSubjects()) {
+        List<Subject> subjects = transcript.getSubjects();
+
+        subjects.sort(Comparator.comparing(Subject::getCode));
+
+        for (Subject s : subjects) {
             dataBuilder.append(s.getCode());
             dataBuilder.append(s.getCredits());
             dataBuilder.append(s.getGrade());
         }
-
+        log.info("ISSUE DATA STRING: {}", dataBuilder.toString());
         String hash = HashUtil.generateHash(dataBuilder.toString());
         transcript.setBlockchainHash(hash);
 
@@ -123,21 +129,21 @@ public class TranscriptServiceImpl implements TranscriptService {
 
     @Override
     public List<Transcript> getAllTranscripts() {
-        return transcriptRepository.findAll();
+        return transcriptRepository.findByActiveTrue();
     }
 
     // GET BY STUDENT ID
 
     @Override
     public List<Transcript> getTranscriptsByStudentId(Long studentId) {
-        return transcriptRepository.findByStudent_Id(studentId);
+        return transcriptRepository.findByStudent_IdAndActiveTrue(studentId);
     }
 
     // GET BY STUDENT EMAIL
 
     @Override
     public List<Transcript> getTranscriptsByStudentEmail(String email) {
-        return transcriptRepository.findByStudent_Email(email);
+        return transcriptRepository.findByStudent_EmailAndActiveTrue(email);
     }
 
     // DASHBOARD STATS
@@ -200,5 +206,36 @@ public class TranscriptServiceImpl implements TranscriptService {
     @Override
     public long getTotalTranscripts() {
         return transcriptRepository.count();
+    }
+    @Override
+    public void deleteTranscript(Long id) {
+
+        Transcript transcript = transcriptRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transcript not found"));
+
+        transcript.setActive(false);
+
+        transcriptRepository.save(transcript);
+    }
+    @Override
+    public TranscriptDetailDTO getTranscriptById(Long id) {
+
+        Transcript t = transcriptRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transcript not found"));
+
+        TranscriptDetailDTO dto = new TranscriptDetailDTO();
+
+        dto.setId(t.getId());
+        dto.setStudentName(t.getStudent().getName());
+        dto.setStudentEmail(t.getStudent().getEmail());
+        dto.setDepartment(t.getStudent().getDepartment());
+        dto.setProgram(t.getProgram());
+        dto.setSemester(t.getSemester());
+        dto.setCgpa(t.getCgpa());
+        dto.setBlockchainRecordId(t.getBlockchainRecordId());
+        dto.setBlockchainTxId(t.getBlockchainTxId());
+        dto.setBlockchainHash(t.getBlockchainHash());
+
+        return dto;
     }
 }

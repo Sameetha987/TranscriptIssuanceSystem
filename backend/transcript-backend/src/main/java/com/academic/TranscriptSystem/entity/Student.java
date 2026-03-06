@@ -1,5 +1,6 @@
 package com.academic.TranscriptSystem.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
@@ -33,8 +34,13 @@ public class Student {
     private String department;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Transcript> transcripts;
+
+    @Column(nullable = false)
+    private Boolean active = true;
 }

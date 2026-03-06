@@ -45,7 +45,10 @@ public class AuthController {
         if (admin == null) {
             return new ApiResponse<>(false, "Admin not found", null);
         }
-
+        System.out.println("RAW PASSWORD: " + request.getPassword());
+        System.out.println("DB HASH: " + admin.getPassword());
+        System.out.println("MATCH RESULT: " +
+                passwordEncoder.matches(request.getPassword(), admin.getPassword()));
         boolean passwordMatches = passwordEncoder.matches(
                 request.getPassword(),
                 admin.getPassword()

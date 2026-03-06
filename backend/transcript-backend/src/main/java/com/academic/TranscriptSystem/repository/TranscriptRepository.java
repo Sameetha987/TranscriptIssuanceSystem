@@ -6,10 +6,13 @@ import java.util.List;
 
 public interface TranscriptRepository extends JpaRepository<Transcript, Long> {
 
-    List<Transcript> findByStudent_Id(Long studentId);
+    List<Transcript> findByStudent_IdAndActiveTrue(Long studentId);
 
-    List<Transcript> findByStudent_Email(String email);
-    boolean existsByStudent_StudentRollAndSemester(
+    List<Transcript> findByStudent_EmailAndActiveTrue(String email);
+
+    List<Transcript> findByActiveTrue();
+
+    boolean existsByStudent_StudentRollAndSemesterAndActiveTrue(
             String studentRoll,
             Integer semester
     );

@@ -2,6 +2,7 @@ package com.academic.TranscriptSystem.service;
 
 import com.academic.TranscriptSystem.dto.DashboardStatsDTO;
 import com.academic.TranscriptSystem.dto.IssueTranscriptDTO;
+import com.academic.TranscriptSystem.dto.TranscriptDetailDTO;
 import com.academic.TranscriptSystem.entity.Transcript;
 import java.util.List;
 
@@ -20,4 +21,8 @@ public interface TranscriptService {
     long getTotalTranscripts();
 
     DashboardStatsDTO getDashboardStats();
+
+    void deleteTranscript(Long id);
+
+    TranscriptDetailDTO getTranscriptById(Long id);
 }

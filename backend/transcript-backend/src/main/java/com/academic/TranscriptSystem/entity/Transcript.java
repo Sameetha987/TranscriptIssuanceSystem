@@ -1,6 +1,7 @@
 package com.academic.TranscriptSystem.entity;
 
-import com.academic.TranscriptSystem.dto.SubjectRequestDTO;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
@@ -21,6 +22,7 @@ public class Transcript {
 
     @ManyToOne
     @JoinColumn(name = "student_id", nullable = false)
+    @JsonIgnoreProperties({"transcripts"})
     private Student student;
 
     private String program;
@@ -28,7 +30,8 @@ public class Transcript {
     private Integer semester;
 
     private Double cgpa;
-
+    @Column(nullable = false)
+    private boolean active = true;
     private Long blockchainRecordId;
     private String blockchainHash;
     private String blockchainTxId;

@@ -2,6 +2,7 @@ package com.academic.TranscriptSystem.service.impl;
 
 import com.academic.TranscriptSystem.blockchain.service.BlockchainService;
 import com.academic.TranscriptSystem.dto.TranscriptVerificationResponseDTO;
+import com.academic.TranscriptSystem.entity.Subject;
 import com.academic.TranscriptSystem.entity.Transcript;
 import com.academic.TranscriptSystem.repository.TranscriptRepository;
 import com.academic.TranscriptSystem.security.HashUtil;
@@ -10,6 +11,9 @@ import com.academic.TranscriptSystem.util.QRCodeUtil;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 public class VerificationServiceImpl implements VerificationService {
@@ -67,14 +71,24 @@ public class VerificationServiceImpl implements VerificationService {
             );
         }
 
-        String dataToHash =
-                transcript.getStudent().getId() +
-                        transcript.getStudent().getEmail() +
-                        transcript.getSemester() +
-                        transcript.getCgpa();
+        StringBuilder dataBuilder = new StringBuilder();
 
-        String recalculatedHash = HashUtil.generateHash(dataToHash);
+        dataBuilder.append(transcript.getStudent().getId());
+        dataBuilder.append(transcript.getStudent().getEmail());
+        dataBuilder.append(transcript.getSemester());
+        dataBuilder.append(transcript.getCgpa());
 
+        List<Subject> subjects = transcript.getSubjects();
+        subjects.sort(Comparator.comparing(Subject::getCode));
+
+        for (Subject s : subjects) {
+            dataBuilder.append(s.getCode());
+            dataBuilder.append(s.getCredits());
+            dataBuilder.append(s.getGrade());
+        }
+        log.info("Verify DATA STRING: {}", dataBuilder.toString());
+        String recalculatedHash =
+                HashUtil.generateHash(dataBuilder.toString());
         log.info("Blockchain Hash: {}", blockchainHash);
         log.info("Recalculated Hash: {}", recalculatedHash);
 
@@ -82,7 +96,7 @@ public class VerificationServiceImpl implements VerificationService {
 
         log.info("Verification result: {}", valid);
 
-        String status = valid ? "AUTHENTIC" : "TAMPERED";
+        String status = valid ? "VERIFIED" : "TAMPERED";
 
         String verifyUrl =
                 "http://localhost:8080/api/transcripts/public/verify/" + transcriptId;
