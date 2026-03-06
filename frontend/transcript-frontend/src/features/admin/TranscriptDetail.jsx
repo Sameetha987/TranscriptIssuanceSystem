@@ -8,10 +8,12 @@ const TranscriptDetail = () => {
   const { id } = useParams();
   const [transcript, setTranscript] = useState(null);
   const [subjects, setSubjects] = useState([]);
+  const [verificationStatus, setVerificationStatus] = useState("PENDING");
 
   useEffect(() => {
+      if(!id) return;
     fetchTranscript();
-  }, []);
+  }, [id]);
 
   const fetchTranscript = async () => {
     try {
@@ -21,8 +23,12 @@ const TranscriptDetail = () => {
       const sRes = await axios.get(`/api/subjects/transcript/${id}`);
       setSubjects(sRes.data);
 
+      const vRes = await axios.get(`/api/transcripts/verify/${id}`);
+      console.log("Verification API Response:", vRes.data);
+      setVerificationStatus(vRes.data.data.status);
+
     } catch (err) {
-      console.error("Failed to load transcript");
+      console.error("Failed to load transcript",err);
     }
   };
 
@@ -97,7 +103,7 @@ const TranscriptDetail = () => {
         <p><strong>Transaction ID:</strong> {transcript.blockchainTxId}</p>
 
         <div className="mt-4">
-          <StatusBadge status={transcript.blockchainHash ? "AUTHENTIC" : "PENDING"} />
+          <StatusBadge status={verificationStatus} />
         </div>
 
       </div>

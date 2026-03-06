@@ -10,9 +10,18 @@ const AdminTranscripts = () => {
   const [loading, setLoading] = useState(true);
   const [verificationMap, setVerificationMap] = useState({});
   const navigate = useNavigate();
+  const [deleteId, setDeleteId] = useState(null);
   useEffect(() => {
     fetchTranscripts();
   }, []);
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 5;
+  const indexOfLast = currentPage * recordsPerPage;
+  const indexOfFirst = indexOfLast - recordsPerPage;
+
+  const currentRecords = transcripts.slice(indexOfFirst, indexOfLast);
+
+  const totalPages = Math.ceil(transcripts.length / recordsPerPage);
 
   const downloadPdf = async (id) => {
     try {
@@ -52,13 +61,24 @@ const AdminTranscripts = () => {
   const fetchTranscripts = async () => {
     try {
       const response = await axios.get("/api/transcripts");
-      const data = response.data;
-      setTranscripts(data);
 
-      // Verify each transcript
+      console.log("FULL RESPONSE:", response.data);
+
+      const list = response.data;
+
+      if (!Array.isArray(list)) {
+        console.error("Transcripts is not array:", list);
+        setTranscripts([]);
+        return;
+      }
+
+      setTranscripts(list);
+
       const verificationResults = {};
 
-      for (let t of data) {
+      for (let t of list) {
+        if (!t?.id) continue;
+
         try {
           const verifyRes = await axios.get(
             `/api/transcripts/verify/${t.id}`
@@ -76,6 +96,7 @@ const AdminTranscripts = () => {
 
     } catch (error) {
       console.error("Error fetching transcripts", error);
+      setTranscripts([]);
     } finally {
       setLoading(false);
     }
@@ -83,8 +104,10 @@ const AdminTranscripts = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-20">
-        <div className="w-10 h-10 border-4 border-blue-800 border-t-transparent rounded-full animate-spin"></div>
+      <div className="space-y-4">
+        {[1,2,3].map(i => (
+          <div key={i} className="h-16 bg-slate-200 rounded-xl animate-pulse"></div>
+        ))}
       </div>
     );
   }
@@ -100,88 +123,234 @@ const AdminTranscripts = () => {
       </div>
     );
   }
+  const handleDelete = async (id) => {
+
+    const confirmDelete = window.confirm(
+      "Are you sure you want to archive this transcript?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`/api/transcripts/${id}`);
+
+      toast.success("Transcript archived successfully");
+
+      setTranscripts(prev =>
+        prev.filter(t => t.id !== id)
+      );
+
+    } catch (err) {
+      toast.error("Delete failed");
+    }
+  };
 
   return (
-    <div>
+    <div className="space-y-8">
 
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-800">
-          Transcripts
+      {/* HEADER */}
+      <div>
+        <h1 className="text-4xl font-bold text-slate-900">
+          Transcript Management
         </h1>
-        <p className="text-slate-500 mt-1">
-          Manage and verify issued transcripts
+        <p className="text-slate-500 mt-2">
+          Monitor, verify and manage issued academic transcripts
         </p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+      {/* CONTROL BAR */}
+      <div className="bg-white rounded-2xl shadow-sm border p-6 flex justify-between items-center">
+
+        <div className="relative w-96">
+          <input
+            type="text"
+            placeholder="Search by name or roll number..."
+            className="w-full p-3 pl-4 border rounded-xl focus:ring-2 focus:ring-blue-800 focus:outline-none"
+          />
+        </div>
+
+        <div className="flex items-center gap-4">
+          <span className="text-slate-500 text-sm">
+            Total: <span className="font-semibold text-slate-800">{transcripts.length}</span>
+          </span>
+
+          <select className="p-3 border rounded-xl focus:ring-2 focus:ring-blue-800 focus:outline-none">
+            <option>All</option>
+            <option>Verified</option>
+            <option>Pending</option>
+            <option>Tampered</option>
+          </select>
+        </div>
+      </div>
+
+      {/* TABLE CARD */}
+      <div className="bg-white rounded-2xl shadow-lg border overflow-hidden">
 
         <table className="w-full text-left">
 
-          <thead className="bg-slate-100 text-slate-600 text-sm uppercase">
+          <thead className="bg-slate-900 text-white text-sm uppercase tracking-wide">
             <tr>
-              <th className="px-6 py-4">ID</th>
-              <th className="px-6 py-4">Student</th>
-              <th className="px-6 py-4">Semester</th>
-              <th className="px-6 py-4">CGPA</th>
-              <th className="px-6 py-4">Status</th>
-              <th className="px-6 py-4">Actions</th>
+              <th className="px-6 py-5">ID</th>
+              <th className="px-6 py-5">Student</th>
+              <th className="px-6 py-5">Semester</th>
+              <th className="px-6 py-5">CGPA</th>
+              <th className="px-6 py-5">Status</th>
+              <th className="px-6 py-5">Actions</th>
             </tr>
           </thead>
 
           <tbody>
-            {transcripts.map((t) => (
+            {currentRecords.map((t) => (
               <tr
                 key={t.id}
                 className="border-t hover:bg-slate-50 transition"
               >
-                <td className="px-6 py-4 font-medium text-slate-800">
+                <td className="px-6 py-5 font-semibold text-slate-800">
                   #{t.id}
                 </td>
-                <td className="px-6 py-4">{t.studentName}</td>
-                <td className="px-6 py-4">{t.semester}</td>
-                <td className="px-6 py-4">{t.cgpa}</td>
-                <td className="px-6 py-4">
+
+                <td className="px-6 py-5">
+                  <div className="font-semibold text-slate-800">
+                    {t.student?.name}
+                  </div>
+                  <div className="text-sm text-slate-500">
+                    {t.student?.studentRoll}
+                  </div>
+                </td>
+
+                <td className="px-6 py-5 font-medium text-slate-700">
+                  {t.semester}
+                </td>
+
+                <td className="px-6 py-5 font-semibold text-blue-800">
+                  {t.cgpa}
+                </td>
+
+                <td className="px-6 py-5">
                   <StatusBadge status={verificationMap[t.id]} />
                 </td>
-                <td className="px-6 py-4 space-x-2">
 
-                  <button
-                    onClick={() => downloadPdf(t.id)}
-                    className="px-3 py-1 text-sm bg-blue-800 text-white rounded-md hover:bg-blue-900 transition"
-                  >
-                    PDF
-                  </button>
+                <td className="px-6 py-5">
+                  <div className="flex gap-2">
 
-                  <button
-                    onClick={() => window.open(`http://localhost:8080/api/transcripts/public/verify/${t.id}`)}
-                    className="px-3 py-1 text-sm bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition"
-                  >
-                    Verify
-                  </button>
+                    <button
+                      onClick={() => downloadPdf(t.id)}
+                      className="px-3 py-2 text-sm bg-blue-800 text-white rounded-lg hover:bg-blue-900 transition transform hover:scale-105 active:scale-95"
+                    >
+                      PDF
+                    </button>
 
-                  <button
-                    onClick={() => reVerify(t.id)}
-                    className="px-3 py-1 text-sm bg-emerald-700 text-white rounded-md hover:bg-emerald-800 transition"
-                  >
-                    Re-Verify
-                  </button>
+                    <button
+                      onClick={() => reVerify(t.id)}
+                      className="px-3 py-2 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition transform hover:scale-105 active:scale-95"
+                    >
+                      Re-Verify
+                    </button>
 
-                  <button
-                    onClick={() => navigate(`/admin/transcripts/${t.id}`)}
-                    className="px-3 py-1 text-sm bg-slate-800 text-white rounded-md hover:bg-slate-900 transition"
-                  >
-                    View
-                  </button>
-
+                    <button
+                      onClick={() => {
+                          console.log("Navigating with ID:", t.id);
+                          navigate(`/admin/transcripts/${t.id}`);
+                          }}
+                      className="px-3 py-2 text-sm bg-slate-800 text-white rounded-lg hover:bg-slate-900 transition transform hover:scale-105 active:scale-95"
+                    >
+                      View
+                    </button>
+                    <button
+                        onClick={() => handleDelete(t.id)}
+                        className="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition"
+                      >
+                        Delete
+                      </button>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
 
         </table>
-
       </div>
+      {deleteId && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-xl p-8 w-96 space-y-6">
+            <h3 className="text-lg font-semibold text-slate-800">
+              Archive Transcript?
+            </h3>
 
+            <p className="text-slate-500 text-sm">
+              This transcript will be hidden from active records.
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteId(null)}
+                className="px-4 py-2 bg-slate-200 rounded-lg hover:bg-slate-300 transition"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => {
+                  handleDelete(deleteId);
+                  setDeleteId(null);
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+              >
+                Archive
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      <div className="flex justify-between items-center mt-6">
+
+        <span className="text-sm text-slate-500">
+          Showing {indexOfFirst + 1}–
+          {Math.min(indexOfLast, transcripts.length)} of {transcripts.length}
+        </span>
+
+        <div className="flex gap-2">
+
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(prev => prev - 1)}
+            className={`px-4 py-2 rounded-lg border ${
+              currentPage === 1
+                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                : "hover:bg-slate-100"
+            }`}
+          >
+            Prev
+          </button>
+
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`px-4 py-2 rounded-lg border ${
+                currentPage === i + 1
+                  ? "bg-blue-800 text-white"
+                  : "hover:bg-slate-100"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(prev => prev + 1)}
+            className={`px-4 py-2 rounded-lg border ${
+              currentPage === totalPages
+                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                : "hover:bg-slate-100"
+            }`}
+          >
+            Next
+          </button>
+
+        </div>
+      </div>
     </div>
   );
 };

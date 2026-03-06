@@ -15,13 +15,17 @@ const AdminLogin = () => {
         username,
         password,
       });
-
+      if (!response.data.success) {
+        alert(response.data.message);
+        return;
+      }
       const token = response.data.data;
       login(token, "ADMIN");
       navigate("/admin");
-    } catch {
-      alert("Invalid credentials");
-    }
+    } catch (error) {
+        console.error(error);
+        alert("Login failed");
+      }
   };
 
   return (

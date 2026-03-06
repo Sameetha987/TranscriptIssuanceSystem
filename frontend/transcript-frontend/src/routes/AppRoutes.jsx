@@ -26,9 +26,9 @@ const AppRoutes = () => {
           }
         >
           <Route index element={<Dashboard />} />
-          <Route path="/admin/students/create" element={<AdminCreateStudent />} />
-          <Route path="/admin/students" element={<AdminStudentList />} />
-          <Route path="/admin/students/:id" element={<AdminStudentProfile />} />
+          <Route path="students/create" element={<AdminCreateStudent />} />
+          <Route path="students" element={<AdminStudentList />} />
+          <Route path="students/:id" element={<AdminStudentProfile />} />
           <Route path="issue" element={<IssueTranscript />} />
           <Route path="transcripts" element={<AdminTranscripts />} />
           <Route path="transcripts/:id" element={<TranscriptDetail />} />
