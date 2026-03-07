@@ -14,7 +14,7 @@ const AdminStudentList = () => {
 
   const fetchStudents = async () => {
     try {
-      const res = await axios.get("/api/admin/students/all");
+      const res = await axios.get("/api/v1/admin/students/all");
       setStudents(res.data.data);
     } catch (err) {
       console.error("Failed to fetch students");

@@ -15,7 +15,7 @@ const AdminStudentProfile = () => {
 
   const fetchStudent = async () => {
     try {
-      const res = await axios.get(`/api/admin/students/${id}`);
+      const res = await axios.get(`/api/v1/admin/students/${id}`);
       const data = res.data.data;
 
       setStudent(data);
@@ -110,7 +110,7 @@ const AdminStudentProfile = () => {
                   onClick={async () => {
                     try {
                       const res = await axios.get(
-                        `/api/transcripts/${t.id}/pdf`,
+                        `/api/v1/transcripts/${t.id}/pdf`,
                         { responseType: "blob" }
                       );
 

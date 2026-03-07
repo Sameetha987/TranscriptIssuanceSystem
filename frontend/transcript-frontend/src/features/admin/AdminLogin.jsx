@@ -11,7 +11,7 @@ const AdminLogin = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("/api/auth/admin/login", {
+      const response = await axios.post("/api/v1/auth/admin/login", {
         username,
         password,
       });

@@ -50,7 +50,7 @@ const IssueTranscript = () => {
 
   const fetchStudents = async () => {
     try {
-      const res = await axios.get("/api/admin/students/all");
+      const res = await axios.get("/api/v1/admin/students/all");
       setStudents(res.data.data);
     } catch (err) {
       console.error("Failed to fetch students");
@@ -137,7 +137,7 @@ const IssueTranscript = () => {
         subjects
       };
 
-      const response = await axios.post("/api/transcripts/issue", payload);
+      const response = await axios.post("/api/v1/transcripts/issue", payload);
       if (!form.studentRoll) {
         toast.error("Please select a student");
         return;

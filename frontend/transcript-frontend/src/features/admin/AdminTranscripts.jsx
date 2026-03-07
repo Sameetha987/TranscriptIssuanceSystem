@@ -26,7 +26,7 @@ const AdminTranscripts = () => {
   const downloadPdf = async (id) => {
     try {
       const response = await axios.get(
-        `/api/transcripts/${id}/pdf`,
+        `/api/v1/transcripts/${id}/pdf`,
         {
           responseType: "blob",
         }
@@ -46,7 +46,7 @@ const AdminTranscripts = () => {
 
   const reVerify = async (id) => {
     try {
-      const res = await axios.get(`/api/transcripts/verify/${id}`);
+      const res = await axios.get(`/api/v1/transcripts/verify/${id}`);
       setVerificationMap(prev => ({
         ...prev,
         [id]: res.data.data.status
@@ -60,7 +60,7 @@ const AdminTranscripts = () => {
 
   const fetchTranscripts = async () => {
     try {
-      const response = await axios.get("/api/transcripts");
+      const response = await axios.get("/api/v1/transcripts");
 
       console.log("FULL RESPONSE:", response.data);
 
@@ -81,7 +81,7 @@ const AdminTranscripts = () => {
 
         try {
           const verifyRes = await axios.get(
-            `/api/transcripts/verify/${t.id}`
+            `/api/v1/transcripts/verify/${t.id}`
           );
 
           verificationResults[t.id] =
@@ -132,7 +132,7 @@ const AdminTranscripts = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`/api/transcripts/${id}`);
+      await axios.delete(`/api/v1/transcripts/${id}`);
 
       toast.success("Transcript archived successfully");
 

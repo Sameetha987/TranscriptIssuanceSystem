@@ -24,7 +24,7 @@ const AdminCreateStudent = () => {
 
     try {
       const res = await axios.post(
-        "/api/admin/students/create",
+        "/api/v1/admin/students/create",
         form
       );
 

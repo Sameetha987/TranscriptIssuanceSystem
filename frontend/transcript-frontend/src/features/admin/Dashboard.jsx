@@ -13,7 +13,7 @@ const Dashboard = () => {
   });
   const fetchStats = async () => {
     try {
-      const res = await axios.get("/api/transcripts/dashboard");
+      const res = await axios.get("/api/v1/transcripts/dashboard");
       setStats(res.data);
     } catch {
       console.error("Failed to load dashboard stats");

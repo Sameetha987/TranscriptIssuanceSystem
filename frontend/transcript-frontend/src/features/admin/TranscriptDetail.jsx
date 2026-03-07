@@ -17,13 +17,13 @@ const TranscriptDetail = () => {
 
   const fetchTranscript = async () => {
     try {
-      const tRes = await axios.get(`/api/transcripts/${id}`);
+      const tRes = await axios.get(`/api/v1/transcripts/${id}`);
       setTranscript(tRes.data);
 
-      const sRes = await axios.get(`/api/subjects/transcript/${id}`);
+      const sRes = await axios.get(`/api/v1/subjects/transcript/${id}`);
       setSubjects(sRes.data);
 
-      const vRes = await axios.get(`/api/transcripts/verify/${id}`);
+      const vRes = await axios.get(`/api/v1/transcripts/verify/${id}`);
       console.log("Verification API Response:", vRes.data);
       setVerificationStatus(vRes.data.data.status);
 
