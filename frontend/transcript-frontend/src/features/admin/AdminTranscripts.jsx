@@ -3,46 +3,44 @@ import axios from "../../api/axios";
 import StatusBadge from "../../components/StatusBadge";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import Pagination from "../../components/Pagination";
 
 const AdminTranscripts = () => {
 
   const [transcripts, setTranscripts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const recordsPerPage = 5;
   const [loading, setLoading] = useState(true);
   const [verificationMap, setVerificationMap] = useState({});
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState(null);
-  useEffect(() => {
-    fetchTranscripts();
-  }, []);
-  const [currentPage, setCurrentPage] = useState(1);
-  const recordsPerPage = 5;
-  const indexOfLast = currentPage * recordsPerPage;
-  const indexOfFirst = indexOfLast - recordsPerPage;
+  const [totalCount, setTotalCount] = useState(0);
 
-  const currentRecords = transcripts.slice(indexOfFirst, indexOfLast);
+    const downloadPdf = async (id) => {
+      try {
 
-  const totalPages = Math.ceil(transcripts.length / recordsPerPage);
+        const response = await axios.get(
+          `/api/v1/transcripts/${id}/pdf`,
+          {
+            responseType: "blob",
+          }
+        );
 
-  const downloadPdf = async (id) => {
-    try {
-      const response = await axios.get(
-        `/api/v1/transcripts/${id}/pdf`,
-        {
-          responseType: "blob",
-        }
-      );
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement("a");
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", `transcript_${id}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (error) {
-      console.error("PDF download failed", error);
-    }
-  };
+        link.href = url;
+        link.setAttribute("download", `transcript-${id}.pdf`);
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+      } catch (error) {
+        console.error("PDF download failed:", error);
+      }
+    };
 
   const reVerify = async (id) => {
     try {
@@ -60,47 +58,43 @@ const AdminTranscripts = () => {
 
   const fetchTranscripts = async () => {
     try {
-      const response = await axios.get("/api/v1/transcripts");
-
-      console.log("FULL RESPONSE:", response.data);
-
-      const list = response.data;
-
-      if (!Array.isArray(list)) {
-        console.error("Transcripts is not array:", list);
-        setTranscripts([]);
-        return;
-      }
+      setLoading(true);
+      const response = await axios.get(
+        `/api/v1/transcripts?page=${currentPage - 1}&size=5`
+      );
+      // Backend returns Page object
+      const list = response.data.content;
 
       setTranscripts(list);
+      setTotalPages(response.data.totalPages);
 
       const verificationResults = {};
 
-      for (let t of list) {
-        if (!t?.id) continue;
+      const results = await Promise.all(
+        list.map(async (t) => {
+          try {
+            const res = await axios.get(`/api/v1/transcripts/verify/${t.id}`);
+            return { id: t.id, status: res.data.data.status };
+          } catch {
+            return { id: t.id, status: "BLOCKCHAIN_ERROR" };
+          }
+        })
+      );
 
-        try {
-          const verifyRes = await axios.get(
-            `/api/v1/transcripts/verify/${t.id}`
-          );
+      const map = {};
+      results.forEach(r => map[r.id] = r.status);
 
-          verificationResults[t.id] =
-            verifyRes.data.data.status;
-
-        } catch {
-          verificationResults[t.id] = "BLOCKCHAIN_ERROR";
-        }
-      }
-
-      setVerificationMap(verificationResults);
+      setVerificationMap(map);
 
     } catch (error) {
-      console.error("Error fetching transcripts", error);
-      setTranscripts([]);
+        console.error(error);
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
   };
+  useEffect(() => {
+    fetchTranscripts();
+  }, [currentPage]);
 
   if (loading) {
     return (
@@ -124,13 +118,6 @@ const AdminTranscripts = () => {
     );
   }
   const handleDelete = async (id) => {
-
-    const confirmDelete = window.confirm(
-      "Are you sure you want to archive this transcript?"
-    );
-
-    if (!confirmDelete) return;
-
     try {
       await axios.delete(`/api/v1/transcripts/${id}`);
 
@@ -171,7 +158,7 @@ const AdminTranscripts = () => {
 
         <div className="flex items-center gap-4">
           <span className="text-slate-500 text-sm">
-            Total: <span className="font-semibold text-slate-800">{transcripts.length}</span>
+            Total: <span className="font-semibold text-slate-800">{totalCount}</span>
           </span>
 
           <select className="p-3 border rounded-xl focus:ring-2 focus:ring-blue-800 focus:outline-none">
@@ -200,7 +187,7 @@ const AdminTranscripts = () => {
           </thead>
 
           <tbody>
-            {currentRecords.map((t) => (
+            {transcripts.map((t) => (
               <tr
                 key={t.id}
                 className="border-t hover:bg-slate-50 transition"
@@ -257,7 +244,7 @@ const AdminTranscripts = () => {
                       View
                     </button>
                     <button
-                        onClick={() => handleDelete(t.id)}
+                        onClick={() => setDeleteId(t.id)}
                         className="bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition"
                       >
                         Delete
@@ -302,56 +289,12 @@ const AdminTranscripts = () => {
           </div>
         </div>
       )}
-      <div className="flex justify-between items-center mt-6">
-
-        <span className="text-sm text-slate-500">
-          Showing {indexOfFirst + 1}–
-          {Math.min(indexOfLast, transcripts.length)} of {transcripts.length}
-        </span>
-
-        <div className="flex gap-2">
-
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(prev => prev - 1)}
-            className={`px-4 py-2 rounded-lg border ${
-              currentPage === 1
-                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                : "hover:bg-slate-100"
-            }`}
-          >
-            Prev
-          </button>
-
-          {[...Array(totalPages)].map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentPage(i + 1)}
-              className={`px-4 py-2 rounded-lg border ${
-                currentPage === i + 1
-                  ? "bg-blue-800 text-white"
-                  : "hover:bg-slate-100"
-              }`}
-            >
-              {i + 1}
-            </button>
-          ))}
-
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(prev => prev + 1)}
-            className={`px-4 py-2 rounded-lg border ${
-              currentPage === totalPages
-                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                : "hover:bg-slate-100"
-            }`}
-          >
-            Next
-          </button>
-
-        </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
       </div>
-    </div>
   );
 };
 
