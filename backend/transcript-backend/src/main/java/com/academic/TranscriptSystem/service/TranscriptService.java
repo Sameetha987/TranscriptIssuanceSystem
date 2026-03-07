@@ -4,6 +4,8 @@ import com.academic.TranscriptSystem.dto.DashboardStatsDTO;
 import com.academic.TranscriptSystem.dto.IssueTranscriptDTO;
 import com.academic.TranscriptSystem.dto.TranscriptDetailDTO;
 import com.academic.TranscriptSystem.entity.Transcript;
+import org.springframework.data.domain.Page;
+
 import java.util.List;
 
 
@@ -15,7 +17,7 @@ public interface TranscriptService {
     // Get all transcripts of a student
     List<Transcript> getTranscriptsByStudentId(Long studentId);
     //Fetch all transcripts
-    List<Transcript> getAllTranscripts();
+    Page<Transcript> getAllTranscripts(int page, int size);
     // Get transcript by email ID
     List<Transcript> getTranscriptsByStudentEmail(String email);
     long getTotalTranscripts();

@@ -5,6 +5,7 @@ import com.academic.TranscriptSystem.entity.Transcript;
 import com.academic.TranscriptSystem.service.PdfService;
 import com.academic.TranscriptSystem.service.TranscriptService;
 import com.academic.TranscriptSystem.response.ApiResponse;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import com.academic.TranscriptSystem.service.VerificationService;
 import com.academic.TranscriptSystem.service.PdfService;
@@ -43,8 +44,11 @@ public class TranscriptController {
         return new ApiResponse<>(true, "Transcript issued successfully", transcript);
     }
     @GetMapping
-    public List<Transcript> getAllTranscripts() {
-        return transcriptService.getAllTranscripts();
+    public Page<Transcript> getAllTranscripts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
+
+        return transcriptService.getAllTranscripts(page, size);
     }
 
     // Get Student Transcripts

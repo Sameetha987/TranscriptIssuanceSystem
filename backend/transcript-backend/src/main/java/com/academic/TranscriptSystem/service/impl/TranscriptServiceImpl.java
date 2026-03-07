@@ -18,6 +18,9 @@ import com.academic.TranscriptSystem.service.TranscriptService;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -113,8 +116,11 @@ public class TranscriptServiceImpl implements TranscriptService {
     // GET ALL
 
     @Override
-    public List<Transcript> getAllTranscripts() {
-        return transcriptRepository.findByActiveTrue();
+    public Page<Transcript> getAllTranscripts(int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return transcriptRepository.findByActiveTrue(pageable);
     }
 
     // GET BY STUDENT ID
