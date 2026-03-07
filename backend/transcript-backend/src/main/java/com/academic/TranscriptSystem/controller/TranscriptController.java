@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/transcripts")
+@RequestMapping("/api/v1/transcripts")
 public class TranscriptController {
 
     private final TranscriptService transcriptService;

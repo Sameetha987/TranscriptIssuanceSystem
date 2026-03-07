@@ -16,7 +16,7 @@ import com.academic.TranscriptSystem.security.JwtUtil;
 
 
 @RestController
-@RequestMapping("/api/auth/admin")
+@RequestMapping("/api/v1/auth/admin")
 public class AuthController {
 
     private final AdminRepository adminRepository;

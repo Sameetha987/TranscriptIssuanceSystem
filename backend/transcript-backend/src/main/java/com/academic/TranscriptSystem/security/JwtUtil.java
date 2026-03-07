@@ -2,6 +2,8 @@ package com.academic.TranscriptSystem.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -10,8 +12,15 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private final String SECRET = "ThisIsVerySecretKeyForJwtSigningThatIsLongEnough";
-    private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
+    @Value("${jwt.secret}")
+    private String secret;
+
+    private Key key;
+
+    @PostConstruct
+    public void init() {
+        key = Keys.hmacShaKeyFor(secret.getBytes());
+    }
 
     public String generateToken(String username, String role) {
 
@@ -44,15 +53,11 @@ public class JwtUtil {
         return extractAllClaims(token).getExpiration();
     }
 
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
-    }
-
     public boolean validateToken(String token) {
 
         try {
             extractUsername(token);
-            return !isTokenExpired(token);
+            return extractExpiration(token).after(new Date());
         } catch (Exception e) {
             return false;
         }

@@ -1,5 +1,6 @@
 package com.academic.TranscriptSystem.blockchain.service.impl;
 
+import com.academic.TranscriptSystem.blockchain.dto.BlockchainResponse;
 import com.academic.TranscriptSystem.blockchain.service.BlockchainService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,7 @@ public class BlockchainServiceImpl implements BlockchainService {
     }
 
     @Override
-    public String storeHash(String hash) {
+    public BlockchainResponse storeHash(String hash) {
 
         int attempts = 0;
         int maxAttempts = 3;
@@ -113,11 +114,13 @@ public class BlockchainServiceImpl implements BlockchainService {
                                 countFunction.getOutputParameters()
                         );
 
-                String recordId = countOutput.get(0).getValue().toString();
+                Long recordId = Long.parseLong(
+                        countOutput.get(0).getValue().toString()
+                );
 
                 log.info("Blockchain success on attempt {}", attempts + 1);
 
-                return recordId;
+                return new BlockchainResponse(txHash, recordId);
 
             } catch (Exception e) {
                 attempts++;

@@ -1,8 +1,10 @@
 package com.academic.TranscriptSystem.blockchain.service;
 
+import com.academic.TranscriptSystem.blockchain.dto.BlockchainResponse;
+
 public interface BlockchainService {
 
-    String storeHash(String hash) throws Exception;
+    BlockchainResponse storeHash(String hash) throws Exception;
     String getHashFromBlockchain(Long recordId) throws Exception;
     Long getLatestRecordId();
 }

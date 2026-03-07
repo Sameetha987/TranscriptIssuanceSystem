@@ -26,8 +26,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
 
-        return path.startsWith("/api/auth")
-                || path.startsWith("/api/transcripts/public");
+        return path.startsWith("/api/v1/auth")
+                || path.startsWith("/api/v1/transcripts/public");
     }
     @Override
     protected void doFilterInternal(HttpServletRequest request,

@@ -27,12 +27,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/transcripts/**").hasRole("ADMIN")
-                        .requestMatchers("/api/transcripts/public/**").permitAll()
-                        //.requestMatchers("/api/transcripts/student/**").hasRole("ADMIN")
-                        .requestMatchers("/api/transcripts/my").hasRole("STUDENT")
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/transcripts/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/transcripts/public/**").permitAll()
+                        .requestMatchers("/api/v1/transcripts/my").hasRole("STUDENT")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter,

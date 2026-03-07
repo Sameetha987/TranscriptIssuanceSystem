@@ -1,5 +1,6 @@
 package com.academic.TranscriptSystem.service.impl;
 
+import com.academic.TranscriptSystem.blockchain.dto.BlockchainResponse;
 import com.academic.TranscriptSystem.blockchain.service.BlockchainService;
 import com.academic.TranscriptSystem.dto.DashboardStatsDTO;
 import com.academic.TranscriptSystem.dto.IssueTranscriptDTO;
@@ -8,9 +9,11 @@ import com.academic.TranscriptSystem.dto.TranscriptDetailDTO;
 import com.academic.TranscriptSystem.entity.Student;
 import com.academic.TranscriptSystem.entity.Subject;
 import com.academic.TranscriptSystem.entity.Transcript;
+import com.academic.TranscriptSystem.exception.ResourceNotFoundException;
 import com.academic.TranscriptSystem.repository.StudentRepository;
 import com.academic.TranscriptSystem.repository.TranscriptRepository;
 import com.academic.TranscriptSystem.security.HashUtil;
+import com.academic.TranscriptSystem.service.HashService;
 import com.academic.TranscriptSystem.service.TranscriptService;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
@@ -27,16 +30,17 @@ public class TranscriptServiceImpl implements TranscriptService {
     private final TranscriptRepository transcriptRepository;
     private final StudentRepository studentRepository;
     private final BlockchainService blockchainService;
-
+    private final HashService hashService;
     private static final Logger log = LoggerFactory.getLogger(TranscriptServiceImpl.class);
 
     public TranscriptServiceImpl(TranscriptRepository transcriptRepository,
                                  StudentRepository studentRepository,
-                                 BlockchainService blockchainService) {
+                                 BlockchainService blockchainService, HashService hashService) {
 
         this.transcriptRepository = transcriptRepository;
         this.studentRepository = studentRepository;
         this.blockchainService = blockchainService;
+        this.hashService = hashService;
     }
 
     // ISSUE TRANSCRIPT
@@ -48,7 +52,7 @@ public class TranscriptServiceImpl implements TranscriptService {
         // Find student by roll
         Student student = studentRepository
                 .findByStudentRoll(request.getStudentRoll())
-                .orElseThrow(() -> new RuntimeException("Student not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
         boolean exists = transcriptRepository
                 .existsByStudent_StudentRollAndSemesterAndActiveTrue(
                         request.getStudentRoll(),
@@ -88,34 +92,15 @@ public class TranscriptServiceImpl implements TranscriptService {
         // Save transcript + subjects (cascade handles subjects)
         transcript = transcriptRepository.save(transcript);
 
-        // Build blockchain hash (student + transcript + subjects)
-        StringBuilder dataBuilder = new StringBuilder();
-
-        dataBuilder.append(student.getId());
-        dataBuilder.append(student.getEmail());
-        dataBuilder.append(transcript.getSemester());
-        dataBuilder.append(transcript.getCgpa());
-
-        List<Subject> subjects = transcript.getSubjects();
-
-        subjects.sort(Comparator.comparing(Subject::getCode));
-
-        for (Subject s : subjects) {
-            dataBuilder.append(s.getCode());
-            dataBuilder.append(s.getCredits());
-            dataBuilder.append(s.getGrade());
-        }
-        log.info("ISSUE DATA STRING: {}", dataBuilder.toString());
-        String hash = HashUtil.generateHash(dataBuilder.toString());
+        // Build blockchain hash
+        String hash = hashService.generateTranscriptHash(transcript);
         transcript.setBlockchainHash(hash);
 
         //  Store on blockchain
         try {
-            String txId = blockchainService.storeHash(hash);
-            transcript.setBlockchainTxId(txId);
-
-            Long recordId = blockchainService.getLatestRecordId();
-            transcript.setBlockchainRecordId(recordId);
+            BlockchainResponse response = blockchainService.storeHash(hash);
+            transcript.setBlockchainTxId(response.getTxHash());
+            transcript.setBlockchainRecordId(response.getRecordId());
 
         } catch (Exception e) {
             log.error("Blockchain transaction failed", e);
@@ -171,21 +156,8 @@ public class TranscriptServiceImpl implements TranscriptService {
                                 t.getBlockchainRecordId()
                         );
 
-                StringBuilder dataBuilder = new StringBuilder();
-
-                dataBuilder.append(t.getStudent().getId());
-                dataBuilder.append(t.getStudent().getEmail());
-                dataBuilder.append(t.getSemester());
-                dataBuilder.append(t.getCgpa());
-
-                for (Subject s : t.getSubjects()) {
-                    dataBuilder.append(s.getCode());
-                    dataBuilder.append(s.getCredits());
-                    dataBuilder.append(s.getGrade());
-                }
-
                 String recalculated =
-                        HashUtil.generateHash(dataBuilder.toString());
+                        hashService.generateTranscriptHash(t);
 
                 if (blockchainHash != null &&
                         blockchainHash.equals(recalculated)) {
@@ -211,7 +183,7 @@ public class TranscriptServiceImpl implements TranscriptService {
     public void deleteTranscript(Long id) {
 
         Transcript transcript = transcriptRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transcript not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Transcript not found"));
 
         transcript.setActive(false);
 
@@ -221,7 +193,7 @@ public class TranscriptServiceImpl implements TranscriptService {
     public TranscriptDetailDTO getTranscriptById(Long id) {
 
         Transcript t = transcriptRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Transcript not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Transcript not found"));
 
         TranscriptDetailDTO dto = new TranscriptDetailDTO();
 

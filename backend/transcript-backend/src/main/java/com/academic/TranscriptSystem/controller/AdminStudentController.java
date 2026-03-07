@@ -4,6 +4,7 @@ import com.academic.TranscriptSystem.dto.StudentDTO;
 import com.academic.TranscriptSystem.dto.StudentProfileDTO;
 import com.academic.TranscriptSystem.dto.TranscriptSummaryDTO;
 import com.academic.TranscriptSystem.entity.Student;
+import com.academic.TranscriptSystem.exception.ResourceNotFoundException;
 import com.academic.TranscriptSystem.repository.StudentRepository;
 import com.academic.TranscriptSystem.response.ApiResponse;
 import jakarta.validation.Valid;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin/students")
+@RequestMapping("/api/v1/admin/students")
 public class AdminStudentController {
 
     private final StudentRepository studentRepository;
@@ -58,7 +59,7 @@ public class AdminStudentController {
     public ApiResponse<StudentProfileDTO> getStudentById(@PathVariable Long id) {
 
         Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Student not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
 
         StudentProfileDTO dto = new StudentProfileDTO();
         dto.setId(student.getId());

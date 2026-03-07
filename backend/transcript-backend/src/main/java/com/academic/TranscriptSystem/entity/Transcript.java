@@ -4,12 +4,21 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "transcripts", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"student_id", "semester"})
-})
+@Table(
+        name = "transcripts",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"student_id", "semester"})
+        },
+        indexes = {
+                @Index(name = "idx_student", columnList = "student_id"),
+                @Index(name = "idx_blockchain_record", columnList = "blockchainRecordId")
+        }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -38,4 +47,21 @@ public class Transcript {
 
     @OneToMany(mappedBy = "transcript", cascade = CascadeType.ALL)
     private List<Subject> subjects;
+
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
+    private String issuedBy;
+
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

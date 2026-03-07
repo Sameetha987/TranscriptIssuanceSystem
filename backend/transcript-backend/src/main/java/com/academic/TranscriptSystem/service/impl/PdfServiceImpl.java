@@ -117,7 +117,7 @@ public class PdfServiceImpl implements PdfService {
             /* ================= QR SECTION ================= */
 
             String verifyUrl =
-                    "http://localhost:8080/api/transcripts/public/verify/" + transcript.getId();
+                    "http://localhost:8080/api/v1/transcripts/public/verify/" + transcript.getId();
 
             byte[] qrImage = QRCodeUtil.generateQrCodeImage(verifyUrl, 150, 150);
 
