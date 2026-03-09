@@ -13,16 +13,14 @@ public interface TranscriptService {
 
     // Issue new transcript
     Transcript issueTranscript(IssueTranscriptDTO request);
-
-    // Get all transcripts of a student
-    List<Transcript> getTranscriptsByStudentId(Long studentId);
     //Fetch all transcripts
-    Page<Transcript> getAllTranscripts(int page, int size);
+    Page<Transcript> getTranscripts(int page, int size, String search, String status);
     // Get transcript by email ID
     List<Transcript> getTranscriptsByStudentEmail(String email);
     long getTotalTranscripts();
 
     DashboardStatsDTO getDashboardStats();
+    Page<Transcript> searchTranscripts(String search, int page, int size, String status);
 
     void deleteTranscript(Long id);
 

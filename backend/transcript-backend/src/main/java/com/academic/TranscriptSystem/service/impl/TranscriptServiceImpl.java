@@ -113,21 +113,23 @@ public class TranscriptServiceImpl implements TranscriptService {
         return transcriptRepository.save(transcript);
     }
 
-    // GET ALL
-
     @Override
-    public Page<Transcript> getAllTranscripts(int page, int size) {
+    public Page<Transcript> searchTranscripts(String search, int page, int size, String status) {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        return transcriptRepository.findByActiveTrue(pageable);
+        return transcriptRepository.searchTranscripts(search, pageable);
     }
-
-    // GET BY STUDENT ID
-
     @Override
-    public List<Transcript> getTranscriptsByStudentId(Long studentId) {
-        return transcriptRepository.findByStudent_IdAndActiveTrue(studentId);
+    public Page<Transcript> getTranscripts(int page, int size, String search, String status) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        if (search != null && !search.isEmpty()) {
+            return transcriptRepository.searchTranscripts(search, pageable);
+        }
+
+        return transcriptRepository.findByActiveTrue(pageable);
     }
 
     // GET BY STUDENT EMAIL

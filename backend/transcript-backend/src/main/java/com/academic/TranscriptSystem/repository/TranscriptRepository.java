@@ -1,21 +1,38 @@
 package com.academic.TranscriptSystem.repository;
 
 import com.academic.TranscriptSystem.entity.Transcript;
-import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 public interface TranscriptRepository extends JpaRepository<Transcript, Long> {
 
-    List<Transcript> findByStudent_IdAndActiveTrue(Long studentId);
-
-    List<Transcript> findByStudent_EmailAndActiveTrue(String email);
-
+    // Normal pagination
     Page<Transcript> findByActiveTrue(Pageable pageable);
+
+    // Search transcripts
+    @Query("""
+    SELECT t FROM Transcript t
+    JOIN t.student s
+    WHERE t.active = true
+    AND (
+        LOWER(s.name) LIKE LOWER(CONCAT('%', :search, '%'))
+        OR LOWER(s.studentRoll) LIKE LOWER(CONCAT('%', :search, '%'))
+    )
+    """)
+    Page<Transcript> searchTranscripts(
+            @Param("search") String search,
+            Pageable pageable
+    );
 
     boolean existsByStudent_StudentRollAndSemesterAndActiveTrue(
             String studentRoll,
             Integer semester
     );
+    List<Transcript> findByStudent_EmailAndActiveTrue(String email);
+
 }

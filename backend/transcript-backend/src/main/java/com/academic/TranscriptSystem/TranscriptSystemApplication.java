@@ -10,6 +10,5 @@ public class TranscriptSystemApplication {
     public static void main(String[] args) {
         SpringApplication.run(TranscriptSystemApplication.class, args);
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-
     }
 }

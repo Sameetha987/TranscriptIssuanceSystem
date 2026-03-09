@@ -44,11 +44,13 @@ public class TranscriptController {
         return new ApiResponse<>(true, "Transcript issued successfully", transcript);
     }
     @GetMapping
-    public Page<Transcript> getAllTranscripts(
+    public Page<Transcript> getTranscripts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size) {
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String status) {
 
-        return transcriptService.getAllTranscripts(page, size);
+        return transcriptService.getTranscripts(page, size, search, status);
     }
 
     // Get Student Transcripts
