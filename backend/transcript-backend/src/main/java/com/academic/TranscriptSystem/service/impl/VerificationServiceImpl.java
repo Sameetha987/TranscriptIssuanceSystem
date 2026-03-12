@@ -2,19 +2,17 @@ package com.academic.TranscriptSystem.service.impl;
 
 import com.academic.TranscriptSystem.blockchain.service.BlockchainService;
 import com.academic.TranscriptSystem.dto.TranscriptVerificationResponseDTO;
-import com.academic.TranscriptSystem.entity.Subject;
 import com.academic.TranscriptSystem.entity.Transcript;
 import com.academic.TranscriptSystem.repository.TranscriptRepository;
-import com.academic.TranscriptSystem.security.HashUtil;
+import com.academic.TranscriptSystem.service.ActivityLogService;
 import com.academic.TranscriptSystem.service.HashService;
 import com.academic.TranscriptSystem.service.VerificationService;
 import com.academic.TranscriptSystem.util.QRCodeUtil;
-import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Service
 public class VerificationServiceImpl implements VerificationService {
@@ -22,12 +20,14 @@ public class VerificationServiceImpl implements VerificationService {
     private final TranscriptRepository transcriptRepository;
     private final BlockchainService blockchainService;
     private final HashService hashService;
+    private final ActivityLogService activityLogService;
     private static final Logger log = LoggerFactory.getLogger(VerificationServiceImpl.class);
     public VerificationServiceImpl(TranscriptRepository transcriptRepository,
-                                   BlockchainService blockchainService, HashService hashService) {
+                                   BlockchainService blockchainService, HashService hashService, ActivityLogService activityLogService) {
         this.transcriptRepository = transcriptRepository;
         this.blockchainService = blockchainService;
         this.hashService = hashService;
+        this.activityLogService = activityLogService;
     }
 
     @Override
@@ -80,7 +80,10 @@ public class VerificationServiceImpl implements VerificationService {
         boolean valid = recalculatedHash.equals(blockchainHash);
 
         String status = valid ? "VERIFIED" : "TAMPERED";
+        transcript.setVerificationStatus(status);
+        transcript.setLastVerifiedAt(LocalDateTime.now());
 
+        transcriptRepository.save(transcript);
         String verifyUrl =
                 "http://localhost:8080/api/v1/transcripts/public/verify/" + transcriptId;
 
@@ -93,6 +96,26 @@ public class VerificationServiceImpl implements VerificationService {
                 status,
                 qrCodeBase64
         );
+    }
+    @Override
+    public TranscriptVerificationResponseDTO reverifyTranscript(Long transcriptId) {
+
+        Transcript transcript = transcriptRepository
+                .findById(transcriptId)
+                .orElse(null);
+
+        TranscriptVerificationResponseDTO response = verifyTranscript(transcriptId);
+
+        if (transcript != null && "VERIFIED".equals(response.getStatus())) {
+
+            activityLogService.log(
+                    "VERIFY_TRANSCRIPT",
+                    transcriptId,
+                    "Transcript verified for Roll " + transcript.getStudent().getStudentRoll()
+            );
+        }
+
+        return response;
     }
 
 

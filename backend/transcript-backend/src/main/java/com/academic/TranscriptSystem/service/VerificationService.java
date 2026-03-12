@@ -6,4 +6,5 @@ public interface VerificationService {
 
     TranscriptVerificationResponseDTO verifyTranscript(Long transcriptId);
 
+    TranscriptVerificationResponseDTO reverifyTranscript(Long transcriptId);
 }

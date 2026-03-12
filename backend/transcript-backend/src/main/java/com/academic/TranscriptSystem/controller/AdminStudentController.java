@@ -7,6 +7,7 @@ import com.academic.TranscriptSystem.entity.Student;
 import com.academic.TranscriptSystem.exception.ResourceNotFoundException;
 import com.academic.TranscriptSystem.repository.StudentRepository;
 import com.academic.TranscriptSystem.response.ApiResponse;
+import com.academic.TranscriptSystem.service.ActivityLogService;
 import jakarta.validation.Valid;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +20,12 @@ public class AdminStudentController {
 
     private final StudentRepository studentRepository;
     private final PasswordEncoder passwordEncoder;
-
+    private final ActivityLogService activityLogService;
     public AdminStudentController(StudentRepository studentRepository,
-                                  PasswordEncoder passwordEncoder) {
+                                  PasswordEncoder passwordEncoder, ActivityLogService activityLogService) {
         this.studentRepository = studentRepository;
         this.passwordEncoder = passwordEncoder;
+        this.activityLogService = activityLogService;
     }
 
     @PostMapping("/create")
@@ -44,8 +46,17 @@ public class AdminStudentController {
         student.setDepartment(dto.getDepartment());
         student.setPassword(passwordEncoder.encode(dto.getPassword()));
 
-        return new ApiResponse<>(true, "Student created successfully",
-                studentRepository.save(student));
+        // Save student first
+        Student saved = studentRepository.save(student);
+
+        // Log activity
+        activityLogService.log(
+                "CREATE_STUDENT",
+                null,
+                "Student created: Roll " + saved.getStudentRoll()
+        );
+
+        return new ApiResponse<>(true, "Student created successfully", saved);
     }
     @GetMapping("/all")
     public ApiResponse<List<Student>> getAllStudents() {

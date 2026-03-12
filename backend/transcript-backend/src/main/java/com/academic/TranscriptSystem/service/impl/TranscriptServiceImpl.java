@@ -12,7 +12,7 @@ import com.academic.TranscriptSystem.entity.Transcript;
 import com.academic.TranscriptSystem.exception.ResourceNotFoundException;
 import com.academic.TranscriptSystem.repository.StudentRepository;
 import com.academic.TranscriptSystem.repository.TranscriptRepository;
-import com.academic.TranscriptSystem.security.HashUtil;
+import com.academic.TranscriptSystem.service.ActivityLogService;
 import com.academic.TranscriptSystem.service.HashService;
 import com.academic.TranscriptSystem.service.TranscriptService;
 import jakarta.transaction.Transactional;
@@ -24,7 +24,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -35,15 +34,17 @@ public class TranscriptServiceImpl implements TranscriptService {
     private final BlockchainService blockchainService;
     private final HashService hashService;
     private static final Logger log = LoggerFactory.getLogger(TranscriptServiceImpl.class);
+    private final ActivityLogService activityLogService;
 
     public TranscriptServiceImpl(TranscriptRepository transcriptRepository,
                                  StudentRepository studentRepository,
-                                 BlockchainService blockchainService, HashService hashService) {
+                                 BlockchainService blockchainService, HashService hashService, ActivityLogService activityLogService) {
 
         this.transcriptRepository = transcriptRepository;
         this.studentRepository = studentRepository;
         this.blockchainService = blockchainService;
         this.hashService = hashService;
+        this.activityLogService = activityLogService;
     }
 
     // ISSUE TRANSCRIPT
@@ -73,7 +74,7 @@ public class TranscriptServiceImpl implements TranscriptService {
         transcript.setProgram(request.getProgram());
         transcript.setSemester(request.getSemester());
         transcript.setCgpa(request.getCgpa());
-
+        transcript.setVerificationStatus("PENDING");
         //  Add subjects (relationship-based)
         List<Subject> subjectList = new ArrayList<>();
 
@@ -94,6 +95,11 @@ public class TranscriptServiceImpl implements TranscriptService {
 
         // Save transcript + subjects (cascade handles subjects)
         transcript = transcriptRepository.save(transcript);
+        activityLogService.log(
+                "ISSUE_TRANSCRIPT",
+                transcript.getId(),
+                "Transcript issued for Roll " + transcript.getStudent().getStudentRoll()
+        );
 
         // Build blockchain hash
         String hash = hashService.generateTranscriptHash(transcript);
@@ -144,44 +150,20 @@ public class TranscriptServiceImpl implements TranscriptService {
     @Override
     public DashboardStatsDTO getDashboardStats() {
 
-        List<Transcript> transcripts = transcriptRepository.findAll();
+        long total = transcriptRepository.count();
 
-        long total = transcripts.size();
-        long authentic = 0;
-        long tampered = 0;
+        long authentic = transcriptRepository.countByVerificationStatus("VERIFIED");
 
-        for (Transcript t : transcripts) {
+        long tampered = transcriptRepository.countByVerificationStatus("TAMPERED");
 
-            try {
+        long students = studentRepository.count();
 
-                if (t.getBlockchainRecordId() == null) {
-                    tampered++;
-                    continue;
-                }
-
-                String blockchainHash =
-                        blockchainService.getHashFromBlockchain(
-                                t.getBlockchainRecordId()
-                        );
-
-                String recalculated =
-                        hashService.generateTranscriptHash(t);
-
-                if (blockchainHash != null &&
-                        blockchainHash.equals(recalculated)) {
-
-                    authentic++;
-
-                } else {
-                    tampered++;
-                }
-
-            } catch (Exception e) {
-                tampered++;
-            }
-        }
-
-        return new DashboardStatsDTO(total, authentic, tampered);
+        return new DashboardStatsDTO(
+                total,
+                authentic,
+                tampered,
+                students
+        );
     }
     @Override
     public long getTotalTranscripts() {
@@ -194,6 +176,11 @@ public class TranscriptServiceImpl implements TranscriptService {
                 .orElseThrow(() -> new ResourceNotFoundException("Transcript not found"));
 
         transcript.setActive(false);
+        activityLogService.log(
+                "DELETE_TRANSCRIPT",
+                id,
+                "Transcript archived for Roll " + transcript.getStudent().getStudentRoll()
+        );
 
         transcriptRepository.save(transcript);
     }

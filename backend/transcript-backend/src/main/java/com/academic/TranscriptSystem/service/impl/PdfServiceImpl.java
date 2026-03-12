@@ -6,6 +6,7 @@ import com.academic.TranscriptSystem.repository.TranscriptRepository;
 import com.academic.TranscriptSystem.repository.SubjectRepository;
 import com.academic.TranscriptSystem.service.PdfService;
 import com.academic.TranscriptSystem.util.QRCodeUtil;
+import com.academic.TranscriptSystem.service.ActivityLogService;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 
@@ -20,11 +21,12 @@ public class PdfServiceImpl implements PdfService {
 
     private final TranscriptRepository transcriptRepository;
     private final SubjectRepository subjectRepository;
-
+    private final ActivityLogService activityLogService;
     public PdfServiceImpl(TranscriptRepository transcriptRepository,
-                          SubjectRepository subjectRepository) {
+                          SubjectRepository subjectRepository, ActivityLogService activityLogService) {
         this.transcriptRepository = transcriptRepository;
         this.subjectRepository = subjectRepository;
+        this.activityLogService = activityLogService;
     }
 
     @Override
@@ -126,6 +128,11 @@ public class PdfServiceImpl implements PdfService {
             document.add(qr);
 
             document.close();
+            activityLogService.log(
+                    "DOWNLOAD_TRANSCRIPT",
+                    transcriptId,
+                    "Transcript downloaded for Roll " + transcript.getStudent().getStudentRoll()
+            );
 
         } catch (Exception e) {
             throw new RuntimeException(e);

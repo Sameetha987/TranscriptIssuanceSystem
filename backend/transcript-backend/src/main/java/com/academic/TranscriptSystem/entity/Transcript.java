@@ -64,4 +64,9 @@ public class Transcript {
     public void preUpdate() {
         updatedAt = LocalDateTime.now();
     }
+    @Column(name = "verification_status")
+    private String verificationStatus;
+
+    @Column(name = "last_verified_at")
+    private LocalDateTime lastVerifiedAt;
 }

@@ -108,6 +108,10 @@ public class TranscriptController {
         transcriptService.deleteTranscript(id);
         return new ApiResponse<>(true, "Transcript archived", null);
     }
+    @GetMapping("/reverify/{id}")
+    public TranscriptVerificationResponseDTO reverifyTranscript(@PathVariable Long id) {
+        return verificationService.reverifyTranscript(id);
+    }
 }
 
 

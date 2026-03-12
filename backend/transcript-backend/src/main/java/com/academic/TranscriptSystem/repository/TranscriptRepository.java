@@ -34,5 +34,5 @@ public interface TranscriptRepository extends JpaRepository<Transcript, Long> {
             Integer semester
     );
     List<Transcript> findByStudent_EmailAndActiveTrue(String email);
-
+    long countByVerificationStatus(String status);
 }
