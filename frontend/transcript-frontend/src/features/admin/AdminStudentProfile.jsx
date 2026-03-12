@@ -33,7 +33,9 @@ const AdminStudentProfile = () => {
       </div>
     );
   }
-
+  const sortedTranscripts = [...transcripts].sort(
+    (a, b) => a.semester - b.semester
+  );
   return (
     <div className="space-y-8">
 
@@ -54,104 +56,140 @@ const AdminStudentProfile = () => {
       {/* STATS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        <div className="bg-white rounded-xl shadow-md border-l-4 border-blue-800 p-6 flex items-center gap-4">
-        <FileText className="text-blue-700" size={26} />
+        {/* Total Transcripts */}
+        <div className="bg-white rounded-xl shadow-md border-l-4 border-blue-700 p-6 flex items-center gap-4">
 
-        <div>
-        <p className="text-slate-500 text-sm">Total Transcripts</p>
-        <h2 className="text-3xl font-bold text-slate-800 mt-1">
-        {transcripts.length}
-        </h2>
+          <FileText className="text-blue-700" size={28} />
+
+          <div>
+            <p className="text-slate-500 text-sm">Total Transcripts</p>
+            <h2 className="text-3xl font-bold text-slate-800">
+              {transcripts.length}
+            </h2>
+          </div>
+
         </div>
 
+
+        {/* Authentic */}
+        <div className="bg-white rounded-xl shadow-md border-l-4 border-green-600 p-6 flex items-center gap-4">
+
+          <ShieldCheck className="text-green-600" size={28} />
+
+          <div>
+            <p className="text-slate-500 text-sm">Authentic</p>
+            <h2 className="text-3xl font-bold text-green-700">
+              {transcripts.filter(t => t.blockchainRecordId).length}
+            </h2>
+          </div>
+
         </div>
 
-        <div className="bg-white rounded-xl shadow-md border-l-4 border-green-600 p-6">
-          <p className="text-slate-500 text-sm">Authentic</p>
-          <h2 className="text-3xl font-bold text-green-700 mt-2">
-              <ShieldCheck className="text-green-600" size={26} />
-            {transcripts.filter(t => t.blockchainRecordId).length}
-          </h2>
-        </div>
 
-        <div className="bg-white rounded-xl shadow-md border-l-4 border-red-600 p-6">
-          <p className="text-slate-500 text-sm">Pending / Failed</p>
-          <h2 className="text-3xl font-bold text-red-700 mt-2">
-              <AlertTriangle className="text-red-600" size={26} />
-            {transcripts.filter(t => !t.blockchainRecordId).length}
-          </h2>
+        {/* Pending */}
+        <div className="bg-white rounded-xl shadow-md border-l-4 border-red-600 p-6 flex items-center gap-4">
+
+          <AlertTriangle className="text-red-600" size={28} />
+
+          <div>
+            <p className="text-slate-500 text-sm">Pending / Failed</p>
+            <h2 className="text-3xl font-bold text-red-700">
+              {transcripts.filter(t => !t.blockchainRecordId).length}
+            </h2>
+          </div>
+
         </div>
 
       </div>
 
       {/* TRANSCRIPT CARDS */}
-      <div className="space-y-4">
+      <h2 className="text-xl font-semibold text-slate-800">
+        Academic Progress
+      </h2>
 
-        {transcripts.map(t => (
-          <div key={t.id}
-               className="bg-white rounded-xl shadow-md p-6 border hover:shadow-lg transition">
+      <div className="bg-white rounded-xl shadow-md p-6">
 
-            <div className="flex justify-between items-center">
+        <div className="relative border-l-2 border-slate-200 ml-3">
 
-              <div>
-                <h3 className="text-xl font-semibold text-slate-800">
-                  Semester {t.semester}
-                </h3>
-                <p className="text-slate-500">
-                  CGPA: {t.cgpa}
-                </p>
-              </div>
+          {sortedTranscripts.map((t, index) => (
 
-              <div className="flex gap-3 items-center">
+            <div key={t.id} className="mb-8 ml-6">
 
-                {t.blockchainRecordId ? (
-                  <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
-                    VERIFIED
-                  </span>
-                ) : (
-                  <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-semibold">
-                    PENDING
-                  </span>
-                )}
-                <button
-                onClick={() => navigate(`/admin/transcripts/${t.id}`)}
-                className="bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-900"
-                >
-                View
-                </button>
-                <button
-                  onClick={async () => {
-                    try {
-                      const res = await axios.get(
-                        `/api/v1/transcripts/${t.id}/pdf`,
-                        { responseType: "blob" }
-                      );
+              {/* Timeline Dot */}
+              <span className={`absolute -left-3 flex items-center justify-center w-6 h-6 rounded-full
+                ${t.blockchainRecordId ? "bg-green-500" : "bg-yellow-500"}`}>
+              </span>
 
-                      const url = window.URL.createObjectURL(new Blob([res.data]));
-                      const link = document.createElement("a");
-                      link.href = url;
-                      link.setAttribute("download", `transcript_${t.id}.pdf`);
-                      document.body.appendChild(link);
-                      link.click();
-                    } catch (err) {
-                      console.error("Failed to download PDF", err);
-                    }
-                  }}
-                  className="bg-blue-800 text-white px-4 py-2 rounded-lg hover:bg-blue-900 transition"
-                >
-                  PDF
-                </button>
+              <div className="flex justify-between items-center">
+
+                {/* Semester Info */}
+                <div>
+
+                  <h3 className="text-lg font-semibold text-slate-800">
+                    Semester {t.semester}
+                  </h3>
+
+                  <p className="text-slate-500">
+                    CGPA: {t.cgpa}
+                  </p>
+
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center gap-3">
+
+                  {t.blockchainRecordId ? (
+                    <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
+                      VERIFIED
+                    </span>
+                  ) : (
+                    <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-sm font-semibold">
+                      PENDING
+                    </span>
+                  )}
+
+                  <button
+                    onClick={() => navigate(`/admin/transcripts/${t.id}`)}
+                    className="bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-900"
+                  >
+                    View
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      try {
+                        const res = await axios.get(
+                          `/api/v1/transcripts/${t.id}/pdf`,
+                          { responseType: "blob" }
+                        );
+
+                        const url = window.URL.createObjectURL(new Blob([res.data]));
+                        const link = document.createElement("a");
+                        link.href = url;
+                        link.setAttribute("download", `transcript_${t.id}.pdf`);
+                        document.body.appendChild(link);
+                        link.click();
+
+                      } catch (err) {
+                        console.error("Failed to download PDF", err);
+                      }
+                    }}
+                    className="bg-blue-800 text-white px-4 py-2 rounded-lg hover:bg-blue-900"
+                  >
+                    PDF
+                  </button>
+
+                </div>
 
               </div>
 
             </div>
 
-          </div>
-        ))}
+          ))}
 
+        </div>
       </div>
-
-    </div>
+      </div>
   );
 };
 

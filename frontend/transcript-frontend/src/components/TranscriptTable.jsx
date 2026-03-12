@@ -1,12 +1,15 @@
 import TranscriptRow from "./TranscriptRow";
-
+import { ArrowUpDown } from "lucide-react";
 const TranscriptTable = ({
   transcripts,
   verificationMap,
   downloadPdf,
   reVerify,
   navigate,
-  setDeleteId
+  setDeleteId,
+  handleSort,
+  openMenuId,
+  setOpenMenuId
 }) => {
 
   return (
@@ -16,12 +19,36 @@ const TranscriptTable = ({
 
         <thead className="bg-slate-900 text-white text-sm uppercase tracking-wide">
           <tr>
-            <th className="px-6 py-5">ID</th>
-            <th className="px-6 py-5">Student</th>
-            <th className="px-6 py-5">Semester</th>
-            <th className="px-6 py-5">CGPA</th>
-            <th className="px-6 py-5">Status</th>
-            <th className="px-6 py-5">Actions</th>
+            <th
+              className="px-6 py-5 cursor-pointer flex items-center gap-2"
+              onClick={() => handleSort("roll")}
+            >
+              ROLL NUMBER
+              <ArrowUpDown size={14}/>
+            </th>
+
+            <th className="px-6 py-5">
+              STUDENT
+            </th>
+
+            <th className="px-6 py-5">
+              SEMESTER
+            </th>
+
+            <th
+              className="px-6 py-5 cursor-pointer flex items-center gap-2"
+              onClick={() => handleSort("cgpa")}
+            >
+              CGPA
+              <ArrowUpDown size={14}/>
+            </th>
+
+            <th className="px-6 py-5">
+              STATUS
+            </th>
+            <th className="px-6 py-5 text-left">
+              ACTIONS
+            </th>
           </tr>
         </thead>
 
@@ -35,6 +62,8 @@ const TranscriptTable = ({
               reVerify={reVerify}
               navigate={navigate}
               setDeleteId={setDeleteId}
+              openMenuId={openMenuId}
+              setOpenMenuId={setOpenMenuId}
             />
           ))}
         </tbody>

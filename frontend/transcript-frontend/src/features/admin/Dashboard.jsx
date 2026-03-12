@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import axios from "../../api/axios";
 import AdminAnalytics from "../../components/AdminAnalytics";
-import AdminRecentActivity from "../../components/AdminRecentActivity";
+import AdminActivityTimeline from "../../components/AdminActivityTimeline";
 import { FileText, ShieldCheck, AlertTriangle, Users } from "lucide-react";
 const Dashboard = () => {
   const [recentTranscripts, setRecentTranscripts] = useState([]);
   const [stats, setStats] = useState({
     total: 0,
     authentic: 0,
-    tampered: 0
+    tampered: 0,
+    students : 0
   });
 
   const fetchRecent = async () => {
@@ -75,7 +76,7 @@ const Dashboard = () => {
       <Users className="text-purple-600" size={30} />
       <div>
       <p className="text-slate-500 text-sm">Students</p>
-      <h2 className="text-3xl font-bold">{stats.totalStudents || 0}</h2>
+      <h2 className="text-3xl font-bold">{stats.students || 0}</h2>
       </div>
 
       </div>
@@ -84,7 +85,7 @@ const Dashboard = () => {
       {/* Analytics Chart */}
       <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <AdminAnalytics stats={stats} />
-          <AdminRecentActivity transcripts={recentTranscripts} />
+          <AdminActivityTimeline />
       </div>
     </div>
   );

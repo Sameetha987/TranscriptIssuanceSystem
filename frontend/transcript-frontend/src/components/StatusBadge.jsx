@@ -1,4 +1,4 @@
-const StatusBadge = ({ status }) => {
+const StatusBadge = ({ status, time }) => {
 
   const styles = {
     VERIFIED: "bg-green-100 text-green-700 border-green-200",
@@ -15,11 +15,22 @@ const StatusBadge = ({ status }) => {
   };
 
   return (
-    <span
-      className={`px-4 py-1.5 text-xs font-semibold rounded-full border tracking-wide ${styles[status] || styles.PENDING}`}
-    >
-      {labelMap[status] || "Pending"}
-    </span>
+    <div className="flex flex-col gap-1">
+
+      <span
+        className={`px-4 py-1.5 text-xs font-semibold rounded-full border tracking-wide w-fit
+        ${styles[status] || styles.PENDING}`}
+      >
+        {labelMap[status] || "Pending"}
+      </span>
+
+      {time && (
+        <span className="text-xs text-slate-400">
+          Verified {time}
+        </span>
+      )}
+
+    </div>
   );
 };
 

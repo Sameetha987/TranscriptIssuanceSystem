@@ -7,7 +7,7 @@ import Pagination from "../../components/Pagination";
 import TranscriptSearchBar from "../../components/TranscriptSearchBar";
 import TranscriptTable from "../../components/TranscriptTable";
 import DeleteTranscriptModal from "../../components/DeleteTranscriptModal";
-
+import TranscriptRow from "../../components/TranscriptRow";
 const AdminTranscripts = () => {
 
   const [transcripts, setTranscripts] = useState([]);
@@ -24,6 +24,10 @@ const AdminTranscripts = () => {
 
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState(null);
+  const [verifyingId, setVerifyingId] = useState(null);
+  const [sortField, setSortField] = useState(null);
+  const [sortDirection, setSortDirection] = useState("asc");
+  const [openMenuId, setOpenMenuId] = useState(null);
 
   const navigate = useNavigate();
   const handleSearch = () => {
@@ -54,36 +58,6 @@ const AdminTranscripts = () => {
       setTranscripts(list);
       setTotalPages(response.data.totalPages);
       setTotalCount(response.data.totalElements);
-
-      /*
-      Fetch blockchain verification
-      */
-
-      const results = await Promise.all(
-
-        list.map(async (t) => {
-
-          try {
-
-            const res = await axios.get(`/api/v1/transcripts/verify/${t.id}`);
-
-            return {
-              id: t.id,
-              status: res.data.data.status
-            };
-
-          } catch {
-
-            return {
-              id: t.id,
-              status: "BLOCKCHAIN_ERROR"
-            };
-
-          }
-
-        })
-
-      );
 
       const map = {};
 
@@ -155,27 +129,38 @@ const AdminTranscripts = () => {
   /*
   Reverify Transcript
   */
+ const reVerify = async (id) => {
+   try {
 
-  const reVerify = async (id) => {
+     setVerifyingId(id);
 
-    try {
+     const res = await axios.get(`/api/v1/transcripts/reverify/${id}`);
 
-      const res = await axios.get(`/api/v1/transcripts/verify/${id}`);
+     const status = res.data.status;
 
-      setVerificationMap(prev => ({
-        ...prev,
-        [id]: res.data.data.status
-      }));
+     // update verificationMap
+     setVerificationMap(prev => ({
+       ...prev,
+       [id]: status
+     }));
 
-      toast.success("Verification updated");
+     // update transcript row status
+     setTranscripts(prev =>
+       prev.map(t =>
+         t.id === id
+           ? { ...t, verificationStatus: status, lastVerifiedAt: new Date().toISOString() }
+           : t
+       )
+     );
 
-    } catch {
+     toast.success("Verification updated");
 
-      toast.error("Verification failed");
-
-    }
-
-  };
+   } catch {
+     toast.error("Verification failed");
+   } finally {
+     setVerifyingId(null);
+   }
+ };
 
   /*
   Delete Transcript
@@ -197,6 +182,36 @@ const AdminTranscripts = () => {
 
     }
 
+  };
+  const handleSort = (field) => {
+
+    const direction =
+      sortField === field && sortDirection === "asc"
+        ? "desc"
+        : "asc";
+
+    setSortField(field);
+    setSortDirection(direction);
+
+    const sorted = [...transcripts].sort((a, b) => {
+
+      let valA = a[field];
+      let valB = b[field];
+
+      if (field === "roll") {
+        valA = a.student?.studentRoll;
+        valB = b.student?.studentRoll;
+      }
+
+      if (direction === "asc") {
+        return valA > valB ? 1 : -1;
+      } else {
+        return valA < valB ? 1 : -1;
+      }
+
+    });
+
+    setTranscripts(sorted);
   };
 
   /*
@@ -238,7 +253,10 @@ const AdminTranscripts = () => {
         reVerify={reVerify}
         navigate={navigate}
         setDeleteId={setDeleteId}
+        handleSort={handleSort}
         loading={loading}
+        openMenuId={openMenuId}
+        setOpenMenuId={setOpenMenuId}
       />
 
       {/* DELETE MODAL */}
