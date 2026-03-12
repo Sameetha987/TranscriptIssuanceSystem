@@ -1,44 +1,51 @@
+import { FileText, ShieldCheck } from "lucide-react";
+
 const AdminRecentActivity = ({ transcripts }) => {
 
-return (
+  if (!transcripts || transcripts.length === 0) {
+    return (
+      <div className="bg-white rounded-xl shadow-md p-6">
+        <h2 className="text-lg font-semibold text-slate-700 mb-4">
+          Recent Activity
+        </h2>
+        <p className="text-slate-500">No recent activity</p>
+      </div>
+    );
+  }
 
+  return (
     <div className="bg-white rounded-xl shadow-md p-6">
 
-    <h2 className="text-lg font-semibold mb-4">
-    Recent Activity
-    </h2>
+      <h2 className="text-lg font-semibold text-slate-700 mb-4">
+        Recent Activity
+      </h2>
 
-    <div className="space-y-4">
+      <div className="space-y-4">
 
-    {transcripts.slice(0,5).map((t) => (
+        {transcripts.map((t) => (
 
-    <div key={t.id} className="flex justify-between border-b pb-2">
+          <div
+            key={t.id}
+            className="flex items-center gap-3 border-b pb-3 hover:bg-slate-50 rounded-lg px-2 py-2 transition"
+          >
 
-    <div>
+            <FileText className="text-blue-600" size={20} />
 
-    <p className="font-medium">
-    {t.student?.name}
-    </p>
+            <div className="text-sm text-slate-700">
+              Transcript #{t.id} issued for
+              <span className="font-semibold ml-1">
+                {t.student?.name || t.studentName}
+              </span>
+            </div>
 
-    <p className="text-sm text-slate-500">
-    Transcript issued
-    </p>
+          </div>
 
-    </div>
+        ))}
 
-    <p className="text-sm text-slate-400">
-    ID #{t.id}
-    </p>
-
-    </div>
-
-    ))}
+      </div>
 
     </div>
-
-    </div>
-
-    );
-    };
+  );
+};
 
 export default AdminRecentActivity;
