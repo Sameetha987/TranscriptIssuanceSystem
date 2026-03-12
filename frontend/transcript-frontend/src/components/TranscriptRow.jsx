@@ -1,4 +1,5 @@
 import StatusBadge from "./StatusBadge";
+import { FileDown, RefreshCcw, Eye, Trash2 } from "lucide-react";
 
 const TranscriptRow = ({
   t,
@@ -42,30 +43,34 @@ const TranscriptRow = ({
 
           <button
             onClick={() => downloadPdf(t.id)}
-            className="px-3 py-2 text-sm bg-blue-800 text-white rounded-lg"
+            className="flex items-center gap-2 px-3 py-2 text-sm bg-blue-800 text-white rounded-lg hover:bg-blue-900"
           >
-            PDF
+          <FileDown size={16}/>
+          PDF
           </button>
 
           <button
             onClick={() => reVerify(t.id)}
-            className="px-3 py-2 text-sm bg-emerald-600 text-white rounded-lg"
+            className="flex items-center gap-2 px-3 py-2 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
           >
-            Re-Verify
+          <RefreshCcw size={16}/>
+          Re-Verify
           </button>
 
           <button
             onClick={() => navigate(`/admin/transcripts/${t.id}`)}
-            className="px-3 py-2 text-sm bg-slate-800 text-white rounded-lg"
+            className="flex items-center gap-2 px-3 py-2 text-sm bg-slate-800 text-white rounded-lg hover:bg-slate-900"
           >
-            View
+          <Eye size={16}/>
+          View
           </button>
 
           <button
             onClick={() => setDeleteId(t.id)}
-            className="px-3 py-2 text-sm bg-red-600 text-white rounded-lg"
+            className="flex items-center gap-2 px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
           >
-            Delete
+          <Trash2 size={16}/>
+          Delete
           </button>
 
         </div>

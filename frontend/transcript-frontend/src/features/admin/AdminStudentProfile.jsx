@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "../../api/axios";
+import { FileText, ShieldCheck, AlertTriangle } from "lucide-react";
 
 const AdminStudentProfile = () => {
 
@@ -53,16 +54,22 @@ const AdminStudentProfile = () => {
       {/* STATS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        <div className="bg-white rounded-xl shadow-md border-l-4 border-blue-800 p-6">
-          <p className="text-slate-500 text-sm">Total Transcripts</p>
-          <h2 className="text-3xl font-bold text-slate-800 mt-2">
-            {transcripts.length}
-          </h2>
+        <div className="bg-white rounded-xl shadow-md border-l-4 border-blue-800 p-6 flex items-center gap-4">
+        <FileText className="text-blue-700" size={26} />
+
+        <div>
+        <p className="text-slate-500 text-sm">Total Transcripts</p>
+        <h2 className="text-3xl font-bold text-slate-800 mt-1">
+        {transcripts.length}
+        </h2>
+        </div>
+
         </div>
 
         <div className="bg-white rounded-xl shadow-md border-l-4 border-green-600 p-6">
           <p className="text-slate-500 text-sm">Authentic</p>
           <h2 className="text-3xl font-bold text-green-700 mt-2">
+              <ShieldCheck className="text-green-600" size={26} />
             {transcripts.filter(t => t.blockchainRecordId).length}
           </h2>
         </div>
@@ -70,6 +77,7 @@ const AdminStudentProfile = () => {
         <div className="bg-white rounded-xl shadow-md border-l-4 border-red-600 p-6">
           <p className="text-slate-500 text-sm">Pending / Failed</p>
           <h2 className="text-3xl font-bold text-red-700 mt-2">
+              <AlertTriangle className="text-red-600" size={26} />
             {transcripts.filter(t => !t.blockchainRecordId).length}
           </h2>
         </div>
@@ -105,7 +113,12 @@ const AdminStudentProfile = () => {
                     PENDING
                   </span>
                 )}
-
+                <button
+                onClick={() => navigate(`/admin/transcripts/${t.id}`)}
+                className="bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-900"
+                >
+                View
+                </button>
                 <button
                   onClick={async () => {
                     try {

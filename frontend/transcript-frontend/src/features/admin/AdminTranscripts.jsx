@@ -26,20 +26,11 @@ const AdminTranscripts = () => {
   const [deleteId, setDeleteId] = useState(null);
 
   const navigate = useNavigate();
-
-  /*
-  Debounced Search
-  */
-  useEffect(() => {
-
-    const delay = setTimeout(() => {
-      setSearch(searchInput);
-    }, 500);
-
-    return () => clearTimeout(delay);
-
-  }, [searchInput]);
-
+  const handleSearch = () => {
+    setCurrentPage(1);
+    setSearch(searchInput);
+    console.log("Searching:", searchInput);
+  };
   /*
   Fetch Transcripts
   */
@@ -114,7 +105,7 @@ const AdminTranscripts = () => {
 
   useEffect(() => {
     fetchTranscripts();
-  }, [currentPage, search]);
+  }, [currentPage, search, filterStatus]);
 
   /*
   Filter Status
@@ -209,22 +200,6 @@ const AdminTranscripts = () => {
   };
 
   /*
-  Loading State
-  */
-
-  if (loading) {
-
-    return (
-      <div className="space-y-4">
-        {[1,2,3].map(i => (
-          <div key={i} className="h-16 bg-slate-200 rounded-xl animate-pulse"></div>
-        ))}
-      </div>
-    );
-
-  }
-
-  /*
   Page UI
   */
 
@@ -243,16 +218,15 @@ const AdminTranscripts = () => {
           Monitor, verify and manage issued academic transcripts
         </p>
       </div>
-
       {/* SEARCH BAR */}
 
       <TranscriptSearchBar
         searchInput={searchInput}
         setSearchInput={setSearchInput}
-        setSearch={setSearch}
         totalCount={totalCount}
         filterStatus={filterStatus}
         setFilterStatus={setFilterStatus}
+        onSearch={handleSearch}
       />
 
       {/* TABLE */}
@@ -264,6 +238,7 @@ const AdminTranscripts = () => {
         reVerify={reVerify}
         navigate={navigate}
         setDeleteId={setDeleteId}
+        loading={loading}
       />
 
       {/* DELETE MODAL */}
