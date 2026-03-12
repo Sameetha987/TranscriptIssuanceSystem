@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "../../api/axios";
 import { FileText, ShieldCheck, AlertTriangle } from "lucide-react";
 
 const AdminStudentProfile = () => {
 
   const { id } = useParams();
-
+  const navigate = useNavigate();
   const [student, setStudent] = useState(null);
   const [transcripts, setTranscripts] = useState([]);
 
