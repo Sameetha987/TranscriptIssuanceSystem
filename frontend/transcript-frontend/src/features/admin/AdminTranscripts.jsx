@@ -28,7 +28,17 @@ const AdminTranscripts = () => {
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
   const [openMenuId, setOpenMenuId] = useState(null);
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setOpenMenuId(null);
+    };
 
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
   const navigate = useNavigate();
   const handleSearch = () => {
     setCurrentPage(1);
