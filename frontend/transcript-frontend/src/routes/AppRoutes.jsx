@@ -10,6 +10,7 @@ import TranscriptDetail from "../features/admin/TranscriptDetail";
 import AdminCreateStudent from "../features/admin/AdminCreateStudent";
 import AdminStudentList from "../features/admin/AdminStudentList";
 import AdminStudentProfile from "../features/admin/AdminStudentProfile";
+import PublicVerify from "../features/verifier/PublicVerify";
 
 const AppRoutes = () => {
   return (
@@ -32,6 +33,7 @@ const AppRoutes = () => {
           <Route path="issue" element={<IssueTranscript />} />
           <Route path="transcripts" element={<AdminTranscripts />} />
           <Route path="transcripts/:id" element={<TranscriptDetail />} />
+          <Route path="/verify" element={<PublicVerify />} />
         </Route>
 
         <Route path="*" element={<AdminLogin />} />
