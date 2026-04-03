@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "../../api/axios";
-import AdminAnalytics from "../../components/AdminAnalytics";
-import AdminActivityTimeline from "../../components/AdminActivityTimeline";
+import AdminAnalytics from "../../components/admin/AdminAnalytics";
+import AdminActivityTimeline from "../../components/admin/AdminActivityTimeline";
 import { FileText, ShieldCheck, AlertTriangle, Users } from "lucide-react";
 const Dashboard = () => {
   const [recentTranscripts, setRecentTranscripts] = useState([]);

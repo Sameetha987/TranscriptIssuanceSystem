@@ -3,11 +3,11 @@ import axios from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
-import Pagination from "../../components/Pagination";
-import TranscriptSearchBar from "../../components/TranscriptSearchBar";
-import TranscriptTable from "../../components/TranscriptTable";
-import DeleteTranscriptModal from "../../components/DeleteTranscriptModal";
-import TranscriptRow from "../../components/TranscriptRow";
+import Pagination from "../../components/admin/Pagination";
+import TranscriptSearchBar from "../../components/admin/TranscriptSearchBar";
+import TranscriptTable from "../../components/admin/TranscriptTable";
+import DeleteTranscriptModal from "../../components/admin/DeleteTranscriptModal";
+import TranscriptRow from "../../components/admin/TranscriptRow";
 const AdminTranscripts = () => {
 
   const [transcripts, setTranscripts] = useState([]);

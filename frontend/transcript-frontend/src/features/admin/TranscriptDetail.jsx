@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "../../api/axios";
-import StatusBadge from "../../components/StatusBadge";
+import StatusBadge from "../../components/admin/StatusBadge";
 import { FileText, ShieldCheck } from "lucide-react";
 
 const TranscriptDetail = () => {
