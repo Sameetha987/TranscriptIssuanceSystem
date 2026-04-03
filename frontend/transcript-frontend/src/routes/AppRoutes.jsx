@@ -10,14 +10,21 @@ import TranscriptDetail from "../features/admin/TranscriptDetail";
 import AdminCreateStudent from "../features/admin/AdminCreateStudent";
 import AdminStudentList from "../features/admin/AdminStudentList";
 import AdminStudentProfile from "../features/admin/AdminStudentProfile";
+
 import PublicVerify from "../features/verifier/PublicVerify";
+import PublicLanding from "../features/verifier/PublicLanding";
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<AdminLogin />} />
 
+        {/* PUBLIC ROUTES */}
+        <Route path="/" element={<PublicLanding />} />
+        <Route path="/verify" element={<PublicVerify />} />
+        <Route path="/login" element={<AdminLogin />} />
+
+        {/* ADMIN ROUTES */}
         <Route
           path="/admin"
           element={
@@ -33,10 +40,11 @@ const AppRoutes = () => {
           <Route path="issue" element={<IssueTranscript />} />
           <Route path="transcripts" element={<AdminTranscripts />} />
           <Route path="transcripts/:id" element={<TranscriptDetail />} />
-          <Route path="/verify" element={<PublicVerify />} />
         </Route>
 
-        <Route path="*" element={<AdminLogin />} />
+        {/* FALLBACK */}
+        <Route path="*" element={<PublicLanding />} />
+
       </Routes>
     </BrowserRouter>
   );
