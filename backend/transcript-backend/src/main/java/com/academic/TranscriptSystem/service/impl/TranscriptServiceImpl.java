@@ -21,8 +21,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,21 +103,28 @@ public class TranscriptServiceImpl implements TranscriptService {
                 "Transcript issued for Roll " + transcript.getStudent().getStudentRoll()
         );
 
-        // Build blockchain hash
+        // Build hash
         String hash = hashService.generateTranscriptHash(transcript);
         transcript.setBlockchainHash(hash);
 
-        //  Store on blockchain
         try {
-            BlockchainResponse response = blockchainService.storeHash(hash);
+            System.out.println(" Calling blockchain...");
+
+            BlockchainResponse response =
+                    blockchainService.storeHash(hash);
+
+            System.out.println(" Blockchain success");
+
             transcript.setBlockchainTxId(response.getTxHash());
             transcript.setBlockchainRecordId(response.getRecordId());
-
+            transcript.setVerificationStatus("VERIFIED");
+            transcript.setLastVerifiedAt(LocalDateTime.now());
         } catch (Exception e) {
-            log.error("Blockchain transaction failed", e);
-            throw new RuntimeException("Blockchain transaction failed");
-        }
+            e.printStackTrace();
+            log.error("Blockchain failed", e);
 
+            transcript.setVerificationStatus("BLOCKCHAIN_ERROR");
+        }
         return transcriptRepository.save(transcript);
     }
 

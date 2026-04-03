@@ -3,6 +3,7 @@ package com.academic.TranscriptSystem.config;
 import com.academic.TranscriptSystem.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,12 +27,20 @@ public class SecurityConfig {
                 .cors(cors -> {})
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // ALWAYS FIRST
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // PUBLIC
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/transcripts/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/transcripts/public/**").permitAll()
+
+                        // ROLE BASED
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/transcripts/my").hasRole("STUDENT")
+                        .requestMatchers("/api/v1/transcripts/**").hasRole("ADMIN")
+
+                        // fallback
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter,

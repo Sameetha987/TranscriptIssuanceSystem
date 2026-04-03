@@ -71,7 +71,7 @@ const AdminTranscripts = () => {
 
       const map = {};
 
-      results.forEach(r => map[r.id] = r.status);
+      list.forEach(r => map[r.id] = r.verificationStatus);
 
       setVerificationMap(map);
 

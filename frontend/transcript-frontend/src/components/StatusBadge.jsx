@@ -9,9 +9,9 @@ const StatusBadge = ({ status, time }) => {
 
   const labelMap = {
     VERIFIED: "Verified",
-    PENDING: "Pending",
+    PENDING: "Processing...",
     TAMPERED: "Tampered",
-    BLOCKCHAIN_ERROR: "Blockchain Error"
+    BLOCKCHAIN_ERROR: "Retry Required"
   };
 
   return (

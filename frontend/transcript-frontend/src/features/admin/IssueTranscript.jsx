@@ -83,6 +83,10 @@ const IssueTranscript = () => {
  const handleSubjectChange = (index, e) => {
    const updated = [...subjects];
    updated[index][e.target.name] = e.target.value;
+   const { name, value } = e.target;
+
+   updated[index][name] = value;
+
    if (name === "code") {
      const duplicate = subjects.some(
        (s, i) => s.code === value && i !== index
@@ -136,12 +140,12 @@ const IssueTranscript = () => {
         cgpa,
         subjects
       };
-
-      const response = await axios.post("/api/v1/transcripts/issue", payload);
       if (!form.studentRoll) {
-        toast.error("Please select a student");
-        return;
+          toast.error("Please select a student");
+          return;
       }
+      const response = await axios.post("/api/v1/transcripts/issue", payload);
+
       setResult(response.data.data);
       toast.success("Transcript issued successfully");
 

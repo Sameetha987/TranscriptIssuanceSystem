@@ -18,6 +18,7 @@ import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.EthCall;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
+import org.web3j.tx.FastRawTransactionManager;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.gas.ContractGasProvider;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
@@ -49,91 +50,54 @@ public class BlockchainServiceImpl implements BlockchainService {
     @Override
     public BlockchainResponse storeHash(String hash) {
 
-        int attempts = 0;
-        int maxAttempts = 3;
+        try {
 
-        while (attempts < maxAttempts) {
-            try {
+            Function function = new Function(
+                    "storeHash",
+                    Arrays.asList(new Utf8String(hash)),
+                    Arrays.asList(new TypeReference<Uint256>() {})
+            );
 
-                Function function = new Function(
-                        "storeHash",
-                        Arrays.asList(new Utf8String(hash)),
-                        Arrays.asList(new TypeReference<Uint256>() {})
-                );
+            String encodedFunction = FunctionEncoder.encode(function);
 
-                String encodedFunction = FunctionEncoder.encode(function);
+            RawTransactionManager txManager =
+                    new RawTransactionManager(web3j, credentials);
 
-                RawTransactionManager txManager =
-                        new RawTransactionManager(web3j, credentials, 11155111);
+            BigInteger gasPrice = web3j.ethGasPrice().send().getGasPrice();
+            BigInteger gasLimit = BigInteger.valueOf(300000);
 
-                EthSendTransaction response =
-                        txManager.sendTransaction(
-                                gasProvider.getGasPrice(),
-                                gasProvider.getGasLimit(),
-                                CONTRACT_ADDRESS,
-                                encodedFunction,
-                                null
-                        );
+            EthSendTransaction response =
+                    txManager.sendTransaction(
+                            gasPrice,
+                            gasLimit,
+                            CONTRACT_ADDRESS,
+                            encodedFunction,
+                            BigInteger.ZERO
+                    );
 
-                if (response.hasError()) {
-                    throw new RuntimeException(response.getError().getMessage());
-                }
-
-                String txHash = response.getTransactionHash();
-
-                // WAIT FOR TRANSACTION TO BE MINED
-                TransactionReceiptProcessor receiptProcessor =
-                        new PollingTransactionReceiptProcessor(web3j, 15000, 40);
-
-                TransactionReceipt receipt =
-                        receiptProcessor.waitForTransactionReceipt(txHash);
-
-                log.info("Transaction mined successfully. Block number: {}", receipt.getBlockNumber());
-
-
-                Function countFunction = new Function(
-                        "recordCount",
-                        Arrays.asList(),
-                        Arrays.asList(new TypeReference<Uint256>() {})
-                );
-
-                String encodedCount = FunctionEncoder.encode(countFunction);
-
-                EthCall countResponse = web3j.ethCall(
-                        Transaction.createEthCallTransaction(
-                                credentials.getAddress(),
-                                CONTRACT_ADDRESS,
-                                encodedCount
-                        ),
-                        DefaultBlockParameterName.LATEST
-                ).send();
-
-                List<Type> countOutput =
-                        FunctionReturnDecoder.decode(
-                                countResponse.getValue(),
-                                countFunction.getOutputParameters()
-                        );
-
-                Long recordId = Long.parseLong(
-                        countOutput.get(0).getValue().toString()
-                );
-
-                log.info("Blockchain success on attempt {}", attempts + 1);
-
-                return new BlockchainResponse(txHash, recordId);
-
-            } catch (Exception e) {
-                attempts++;
-                log.warn("Blockchain transaction attempt {} failed", attempts);
-
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException ignored) {}
+            if (response.hasError()) {
+                throw new RuntimeException(response.getError().getMessage());
             }
-        }
 
-        log.error("Blockchain failed after {} attempts", maxAttempts);
-        throw new RuntimeException("Blockchain transaction failed after retries");
+            String txHash = response.getTransactionHash();
+
+            //  WAIT UNTIL MINED
+            TransactionReceiptProcessor receiptProcessor =
+                    new PollingTransactionReceiptProcessor(web3j, 15000, 40);
+
+            TransactionReceipt receipt =
+                    receiptProcessor.waitForTransactionReceipt(txHash);
+
+            log.info("Transaction mined: {}", receipt.getTransactionHash());
+
+            //RECORD ID AFTER MINING
+            Long recordId = getLatestRecordId();
+
+            return new BlockchainResponse(txHash, recordId);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Blockchain transaction failed", e);
+        }
     }
 
     @Override

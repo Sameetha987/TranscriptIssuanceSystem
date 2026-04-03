@@ -8,12 +8,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TranscriptRepository extends JpaRepository<Transcript, Long> {
 
     // Normal pagination
     Page<Transcript> findByActiveTrue(Pageable pageable);
-
+    @Query("SELECT t FROM Transcript t " +
+            "JOIN FETCH t.student " +
+            "JOIN FETCH t.subjects " +
+            "WHERE t.id = :id")
+    Optional<Transcript> findByIdWithSubjectsAndStudent(Long id);
     // Search transcripts
     @Query("""
     SELECT t FROM Transcript t

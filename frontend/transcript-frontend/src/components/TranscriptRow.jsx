@@ -74,7 +74,7 @@ const TranscriptRow = ({
                 <button
                   onClick={() => {
                     downloadPdf(t.id);
-                    setMenuOpenId(null);
+                    setOpenMenuId(null);
                   }}
                   className="flex items-center gap-2 w-full px-4 py-2 text-sm hover:bg-slate-100"
                 >
@@ -85,7 +85,7 @@ const TranscriptRow = ({
                 <button
                   onClick={() => {
                     reVerify(t.id);
-                    setMenuOpenId(null);
+                    setOpenMenuId(null);
                   }}
                   className="flex items-center gap-2 w-full px-4 py-2 text-sm hover:bg-slate-100"
                 >
@@ -96,7 +96,7 @@ const TranscriptRow = ({
                 <button
                   onClick={() => {
                     setDeleteId(t.id);
-                    setMenuOpenId(null);
+                    setOpenMenuId(null);
                   }}
                   className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                 >

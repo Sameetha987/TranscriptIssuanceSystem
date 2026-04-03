@@ -33,7 +33,9 @@ public class VerificationServiceImpl implements VerificationService {
     @Override
     public TranscriptVerificationResponseDTO verifyTranscript(Long transcriptId) {
 
-        Transcript transcript = transcriptRepository.findById(transcriptId).orElse(null);
+        Transcript transcript = transcriptRepository
+                .findByIdWithSubjectsAndStudent(transcriptId)
+                .orElse(null);
 
         if (transcript == null) {
             return new TranscriptVerificationResponseDTO(
@@ -89,7 +91,8 @@ public class VerificationServiceImpl implements VerificationService {
 
         String qrCodeBase64 =
                 QRCodeUtil.generateBase64QRCode(verifyUrl);
-
+        log.info("Recalculated Hash: {}", recalculatedHash);
+        log.info("Blockchain Hash: {}", blockchainHash);
         return new TranscriptVerificationResponseDTO(
                 transcriptId,
                 transcript.getStudent().getEmail(),
