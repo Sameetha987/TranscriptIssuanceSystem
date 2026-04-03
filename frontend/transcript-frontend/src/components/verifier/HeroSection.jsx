@@ -2,20 +2,27 @@ import { ShieldCheck } from "lucide-react";
 
 const HeroSection = () => {
   return (
-    <div className="text-center mb-10">
+    <div className="text-center space-y-6 mt-10">
 
-      <div className="flex justify-center mb-4">
-        <div className="bg-indigo-100 p-4 rounded-2xl shadow">
-          <ShieldCheck className="text-indigo-600" size={32} />
-        </div>
+      {/* ICON */}
+      <div className="relative w-24 h-24 mx-auto flex items-center justify-center rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-500 shadow-lg">
+
+        {/* Glow effect */}
+        <div className="absolute inset-0 rounded-3xl blur-xl bg-indigo-400 opacity-30"></div>
+
+        {/* Icon */}
+        <ShieldCheck className="text-white relative z-10" size={40} />
+
       </div>
 
-      <h1 className="text-3xl font-bold text-slate-800">
-        Transcript Verification
+      {/* TITLE */}
+      <h1 className="text-3xl md:text-4xl font-bold text-slate-800">
+        Public Transcript Verification
       </h1>
 
-      <p className="text-slate-500 mt-2 text-sm">
-        Public blockchain-based verification portal
+      {/* SUBTEXT */}
+      <p className="text-slate-500 max-w-2xl mx-auto">
+        Secure, tamper-proof verification powered by blockchain technology.
       </p>
 
     </div>

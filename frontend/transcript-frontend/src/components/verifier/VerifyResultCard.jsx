@@ -17,7 +17,7 @@ const VerifyResultCard = ({ data }) => {
   };
 
   return (
-    <div className="mt-8 bg-white rounded-2xl shadow-xl border p-6 space-y-6">
+    <div className="mt-8 bg-white rounded-2xl shadow-2xl border p-6 space-y-6 ring-1 ring-indigo-100">
 
       {/* HEADER */}
       <div className="flex items-center justify-between">
@@ -32,7 +32,7 @@ const VerifyResultCard = ({ data }) => {
 
         {/* EMAIL */}
         <div className="flex items-center gap-3 bg-slate-50 p-4 rounded-xl border">
-          <Mail className="text-indigo-600" size={18} />
+          <Mail className="text-indigo-600" size={28} />
           <div>
             <p className="text-xs text-slate-500">Student Email</p>
             <p className="text-sm font-medium text-slate-800">
