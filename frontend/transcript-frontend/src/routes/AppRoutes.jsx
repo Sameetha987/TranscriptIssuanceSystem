@@ -10,6 +10,10 @@ import TranscriptDetail from "../features/admin/TranscriptDetail";
 import AdminCreateStudent from "../features/admin/AdminCreateStudent";
 import AdminStudentList from "../features/admin/AdminStudentList";
 import AdminStudentProfile from "../features/admin/AdminStudentProfile";
+import StudentDashboard from "../features/student/StudentDashboard";
+import MyTranscripts from "../features/student/MyTranscripts";
+import StudentTranscriptDetail from "../features/student/StudentTranscriptDetail";
+import StudentLayout from "../layouts/StudentLayout";
 
 import PublicVerify from "../features/verifier/PublicVerify";
 import PublicLanding from "../features/verifier/PublicLanding";
@@ -40,6 +44,20 @@ const AppRoutes = () => {
           <Route path="issue" element={<IssueTranscript />} />
           <Route path="transcripts" element={<AdminTranscripts />} />
           <Route path="transcripts/:id" element={<TranscriptDetail />} />
+        </Route>
+
+        {/* STUDENT ROUTES */}
+        <Route
+          path="/student"
+          element={
+            <ProtectedRoute role="STUDENT">
+              <StudentLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<StudentDashboard />} />
+          <Route path="transcripts" element={<MyTranscripts />} />
+          <Route path="transcripts/:id" element={<StudentTranscriptDetail />} />
         </Route>
 
         {/* FALLBACK */}
