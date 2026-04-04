@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "../../api/axios";
+import { motion } from "framer-motion";
+import CgpaChart from "../../components/student/CgpaChart";
 import {
   FileText,
   ShieldCheck,
@@ -66,10 +68,15 @@ const StudentDashboard = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="space-y-10"
+    >
 
       {/* PROFILE CARD */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl p-6 shadow-lg">
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl p-6 shadow-md p-6 hover:shadow-lg transition">
 
         <h2 className="text-2xl font-bold">
           {student?.name || "Student"}
@@ -89,7 +96,7 @@ const StudentDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
         {/* TOTAL */}
-        <div className="bg-white rounded-xl shadow-md p-6 flex items-center gap-4">
+        <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl p-6 shadow-md p-6 hover:shadow-lg transition flex items-center gap-4">
 
           <FileText className="text-blue-700" size={28} />
 
@@ -101,7 +108,7 @@ const StudentDashboard = () => {
         </div>
 
         {/* VERIFIED */}
-        <div className="bg-white rounded-xl shadow-md p-6 flex items-center gap-4">
+        <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl p-6 shadow-md p-6 hover:shadow-lg transition flex items-center gap-4">
 
           <ShieldCheck className="text-green-600" size={28} />
 
@@ -115,7 +122,7 @@ const StudentDashboard = () => {
         </div>
 
         {/* TAMPERED */}
-        <div className="bg-white rounded-xl shadow-md p-6 flex items-center gap-4">
+        <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl p-6 shadow-md p-6 hover:shadow-lg transition flex items-center gap-4">
 
           <AlertTriangle className="text-red-600" size={28} />
 
@@ -129,7 +136,7 @@ const StudentDashboard = () => {
         </div>
 
         {/* CGPA */}
-        <div className="bg-white rounded-xl shadow-md p-6 flex items-center gap-4">
+        <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl p-6 shadow-md p-6 hover:shadow-lg transition flex items-center gap-4">
 
           <TrendingUp className="text-purple-600" size={28} />
 
@@ -145,7 +152,7 @@ const StudentDashboard = () => {
       </div>
 
       {/* RECENT TRANSCRIPTS */}
-      <div className="bg-white rounded-xl shadow-md p-6">
+      <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl p-6 shadow-md p-6 hover:shadow-lg transition">
 
         <h2 className="text-lg font-semibold text-slate-800 mb-4">
           Recent Transcripts
@@ -191,8 +198,9 @@ const StudentDashboard = () => {
         )}
 
       </div>
+      <CgpaChart transcripts={transcripts} />
 
-    </div>
+    </motion.div>
   );
 };
 

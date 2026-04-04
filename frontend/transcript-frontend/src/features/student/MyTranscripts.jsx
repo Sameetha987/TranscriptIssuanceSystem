@@ -66,7 +66,7 @@ const MyTranscripts = () => {
   // DOWNLOAD PDF
   const downloadPdf = async (id) => {
     try {
-      const res = await axios.get(`/api/v1/transcripts/${id}/pdf`, {
+      const res = await axios.get(`/api/v1/transcripts/student/${id}/pdf`, {
         responseType: "blob"
       });
 
@@ -82,15 +82,6 @@ const MyTranscripts = () => {
     }
   };
 
-  // REVERIFY
-  const reVerify = async (id) => {
-    try {
-      await axios.get(`/api/v1/transcripts/reverify/${id}`);
-      fetchTranscripts();
-    } catch {
-      console.error("Reverify failed");
-    }
-  };
 
   return (
     <div className="space-y-8">
@@ -200,14 +191,6 @@ const MyTranscripts = () => {
                       className="flex items-center gap-2 px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                     >
                       <FileDown size={16} />
-                    </button>
-
-                    {/* REVERIFY */}
-                    <button
-                      onClick={() => reVerify(t.id)}
-                      className="flex items-center gap-2 px-3 py-2 text-sm bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
-                    >
-                      <RefreshCcw size={16} />
                     </button>
 
                   </td>

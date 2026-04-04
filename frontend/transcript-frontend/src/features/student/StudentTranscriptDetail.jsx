@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "../../api/axios";
-
+ import { motion } from "framer-motion";
 import StatusBadge from "../../components/admin/StatusBadge";
-
+import TranscriptQR from "../../components/student/TranscriptQR";
+import BlockchainCard from "../../components/student/BlockchainCard";
 import {
   FileDown,
   Copy,
@@ -27,11 +28,11 @@ const StudentTranscriptDetail = () => {
   const fetchData = async () => {
     try {
 
-      const tRes = await axios.get(`/api/v1/transcripts/${id}`);
-      setTranscript(tRes.data);
+      const tRes = await axios.get(`/api/v1/transcripts/student/${id}`);
+      setTranscript(tRes.data.data || tRes.data);
 
       const sRes = await axios.get(`/api/v1/subjects/transcript/${id}`);
-      setSubjects(sRes.data);
+      setSubjects(sRes.data.data || sRes.data);
 
       const vRes = await axios.get(`/api/v1/transcripts/verify/${id}`);
       setStatus(vRes.data.data.status);
@@ -45,7 +46,7 @@ const StudentTranscriptDetail = () => {
   const downloadPdf = async () => {
     try {
       const res = await axios.get(
-        `/api/v1/transcripts/${id}/pdf`,
+        `/api/v1/transcripts/student/${id}/pdf`,
         { responseType: "blob" }
       );
 
@@ -75,10 +76,15 @@ const StudentTranscriptDetail = () => {
   const etherscanUrl = `https://sepolia.etherscan.io/tx/${transcript.blockchainTxId}`;
 
   return (
-    <div className="space-y-8">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-10"
+    >
 
       {/* HEADER */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center mb-2">
 
         <h1 className="text-3xl font-bold text-slate-800">
           Transcript #{transcript.id}
@@ -95,7 +101,7 @@ const StudentTranscriptDetail = () => {
       </div>
 
       {/* STUDENT INFO */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl p-6 shadow-lg">
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl p-6 shadow-md hover:shadow-lg transition">
 
         <h2 className="text-xl font-bold">
           {transcript.studentName}
@@ -112,7 +118,7 @@ const StudentTranscriptDetail = () => {
       </div>
 
       {/* SUBJECTS */}
-      <div className="bg-white rounded-xl shadow-md p-6">
+      <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl p-6 shadow-md p-6 hover:shadow-lg transition">
 
         <h2 className="text-lg font-semibold mb-4">
           Subjects
@@ -145,7 +151,7 @@ const StudentTranscriptDetail = () => {
       </div>
 
       {/* BLOCKCHAIN */}
-      <div className="bg-white rounded-xl shadow-md p-6 space-y-4">
+      <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl p-6 shadow-md p-6 space-y-4 hover:shadow-lg transition">
 
         <h2 className="text-lg font-semibold flex items-center gap-2">
           <ShieldCheck size={18} />
@@ -188,8 +194,18 @@ const StudentTranscriptDetail = () => {
         </a>
 
       </div>
+      <div className="grid md:grid-cols-2 gap-6">
 
-    </div>
+        <BlockchainCard
+          status={status}
+          txId={transcript.blockchainTxId}
+        />
+
+        <TranscriptQR id={transcript.id} />
+
+      </div>
+
+    </motion.div>
   );
 };
 

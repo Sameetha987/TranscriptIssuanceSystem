@@ -72,7 +72,7 @@ const StudentProfile = () => {
       </div>
 
       {/* PROFILE CARD */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl p-6 shadow-lg">
+      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl p-6 shadow-md p-6 hover:shadow-lg transition">
 
         <h2 className="text-2xl font-bold">
           {profile.name}
@@ -92,7 +92,7 @@ const StudentProfile = () => {
       <div className="grid md:grid-cols-2 gap-6">
 
         {/* PERSONAL INFO */}
-        <div className="bg-white rounded-xl shadow p-6 space-y-4">
+        <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl p-6 shadow-md p-6 hover:shadow-lg transition space-y-4">
 
           <h2 className="font-semibold text-lg text-slate-800">
             Personal Info
@@ -121,7 +121,7 @@ const StudentProfile = () => {
         </div>
 
         {/* ACCOUNT */}
-        <div className="bg-white rounded-xl shadow p-6 space-y-4">
+        <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl p-6 shadow-md p-6 hover:shadow-lg transition space-y-4">
 
           <h2 className="font-semibold text-lg text-slate-800">
             Account
@@ -141,19 +141,19 @@ const StudentProfile = () => {
       {/* STATS */}
       <div className="grid md:grid-cols-3 gap-6">
 
-        <div className="bg-white p-6 rounded-xl shadow text-center">
+        <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl p-6 shadow-md p-6 hover:shadow-lg transition text-center">
           <p className="text-slate-500 text-sm">Total Transcripts</p>
           <h2 className="text-2xl font-bold">{stats.total}</h2>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow text-center">
+        <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl p-6 shadow-md p-6 hover:shadow-lg transition text-center">
           <p className="text-slate-500 text-sm">Verified</p>
           <h2 className="text-2xl font-bold text-green-600">
             {stats.verified}
           </h2>
         </div>
 
-        <div className="bg-white p-6 rounded-xl shadow text-center">
+        <div className="bbg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl p-6 shadow-md p-6 hover:shadow-lg transition text-center">
           <p className="text-slate-500 text-sm">Latest CGPA</p>
           <h2 className="text-2xl font-bold text-indigo-600">
             {stats.cgpa}
