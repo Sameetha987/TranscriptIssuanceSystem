@@ -112,6 +112,43 @@ public class TranscriptController {
     public TranscriptVerificationResponseDTO reverifyTranscript(@PathVariable Long id) {
         return verificationService.reverifyTranscript(id);
     }
+    @GetMapping("/student/{id}")
+    public TranscriptDetailDTO getTranscriptForStudent(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        TranscriptDetailDTO transcript =
+                transcriptService.getTranscriptById(id);
+
+        if (!transcript.getStudentEmail().equals(email)) {
+            throw new RuntimeException("Unauthorized access");
+        }
+
+        return transcript;
+    }
+    @GetMapping("/student/{id}/pdf")
+    public void downloadStudentTranscript(
+            @PathVariable Long id,
+            Authentication authentication,
+            HttpServletResponse response) {
+
+        String email = authentication.getName();
+
+        TranscriptDetailDTO transcript =
+                transcriptService.getTranscriptById(id);
+
+        if (!transcript.getStudentEmail().equals(email)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition",
+                "attachment; filename=transcript_" + id + ".pdf");
+
+        pdfService.generateTranscriptPdf(id, response);
+    }
 }
 
 

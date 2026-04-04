@@ -1,6 +1,8 @@
 package com.academic.TranscriptSystem.controller;
 
+import com.academic.TranscriptSystem.dto.ChangePasswordDTO;
 import com.academic.TranscriptSystem.dto.StudentProfileDTO;
+import com.academic.TranscriptSystem.dto.TranscriptDetailDTO;
 import com.academic.TranscriptSystem.dto.TranscriptSummaryDTO;
 import com.academic.TranscriptSystem.entity.Student;
 import com.academic.TranscriptSystem.entity.Transcript;
@@ -9,7 +11,9 @@ import com.academic.TranscriptSystem.repository.StudentRepository;
 import com.academic.TranscriptSystem.repository.TranscriptRepository;
 import com.academic.TranscriptSystem.response.ApiResponse;
 
+import com.academic.TranscriptSystem.service.TranscriptService;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,11 +24,15 @@ public class StudentController {
 
     private final StudentRepository studentRepository;
     private final TranscriptRepository transcriptRepository;
+    private final TranscriptService transcriptService;
+    private final PasswordEncoder passwordEncoder;
 
     public StudentController(StudentRepository studentRepository,
-                             TranscriptRepository transcriptRepository) {
+                             TranscriptRepository transcriptRepository, TranscriptService transcriptService, PasswordEncoder passwordEncoder) {
         this.studentRepository = studentRepository;
         this.transcriptRepository = transcriptRepository;
+        this.transcriptService = transcriptService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     //  GET PROFILE
@@ -68,5 +76,26 @@ public class StudentController {
         }).toList();
 
         return new ApiResponse<>(true, "Transcripts fetched", result);
+    }
+    @PutMapping("/change-password")
+    public ApiResponse<String> changePassword(
+            @RequestBody ChangePasswordDTO request,
+            Authentication authentication) {
+
+        String email = authentication.getName();
+
+        Student student = studentRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+
+        // Check current password
+        if (!passwordEncoder.matches(request.getCurrentPassword(), student.getPassword())) {
+            return new ApiResponse<>(false, "Current password incorrect", null);
+        }
+
+        // Set new password
+        student.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        studentRepository.save(student);
+
+        return new ApiResponse<>(true, "Password updated successfully", null);
     }
 }
