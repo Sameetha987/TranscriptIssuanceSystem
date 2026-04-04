@@ -31,8 +31,8 @@ const MyTranscripts = () => {
 
   const fetchTranscripts = async () => {
     try {
-      const res = await axios.get("/api/v1/student/transcripts");
-      const data = res.data.data || [];
+      const res = await axios.get("/api/v1/transcripts/my");
+      const data = res.data || [];
       setTranscripts(data);
       setFiltered(data);
     } catch (err) {
@@ -43,7 +43,7 @@ const MyTranscripts = () => {
   const applyFilters = () => {
     let list = [...transcripts];
 
-    // 🔍 SEARCH (by semester or ID)
+    // SEARCH (by semester or ID)
     if (search) {
       list = list.filter(t =>
         t.id.toString().includes(search) ||
@@ -51,7 +51,7 @@ const MyTranscripts = () => {
       );
     }
 
-    // 🎛️ FILTER
+    //  FILTER
     if (filter !== "All") {
       list = list.filter(t => {
         if (filter === "VERIFIED") return t.blockchainRecordId;
@@ -63,7 +63,7 @@ const MyTranscripts = () => {
     setFiltered(list);
   };
 
-  // 📥 DOWNLOAD PDF
+  // DOWNLOAD PDF
   const downloadPdf = async (id) => {
     try {
       const res = await axios.get(`/api/v1/transcripts/${id}/pdf`, {
@@ -82,7 +82,7 @@ const MyTranscripts = () => {
     }
   };
 
-  // 🔄 REVERIFY
+  // REVERIFY
   const reVerify = async (id) => {
     try {
       await axios.get(`/api/v1/transcripts/reverify/${id}`);

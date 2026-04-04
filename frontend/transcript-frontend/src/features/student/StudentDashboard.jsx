@@ -26,18 +26,18 @@ const StudentDashboard = () => {
   const fetchData = async () => {
     try {
 
-      // 🔹 Get student profile (you may already have endpoint)
+      //  Get student profile
       const profileRes = await axios.get("/api/v1/student/profile");
 
-      const transcriptRes = await axios.get("/api/v1/student/transcripts");
+      const transcriptRes = await axios.get("/api/v1/transcripts/my");
 
       const studentData = profileRes.data.data;
-      const transcriptList = transcriptRes.data.data || [];
+      const transcriptList = transcriptRes.data || [];
 
       setStudent(studentData);
       setTranscripts(transcriptList);
 
-      // 📊 Calculate stats
+      //  Calculate stats
       const total = transcriptList.length;
 
       const verified = transcriptList.filter(

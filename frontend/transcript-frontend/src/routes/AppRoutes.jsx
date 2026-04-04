@@ -14,7 +14,7 @@ import StudentDashboard from "../features/student/StudentDashboard";
 import MyTranscripts from "../features/student/MyTranscripts";
 import StudentTranscriptDetail from "../features/student/StudentTranscriptDetail";
 import StudentLayout from "../layouts/StudentLayout";
-
+import StudentProfile from "../features/student/StudentProfile";
 import PublicVerify from "../features/verifier/PublicVerify";
 import PublicLanding from "../features/verifier/PublicLanding";
 
@@ -58,6 +58,7 @@ const AppRoutes = () => {
           <Route index element={<StudentDashboard />} />
           <Route path="transcripts" element={<MyTranscripts />} />
           <Route path="transcripts/:id" element={<StudentTranscriptDetail />} />
+          <Route path="profile" element={<StudentProfile />} />
         </Route>
 
         {/* FALLBACK */}

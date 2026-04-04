@@ -12,23 +12,43 @@ const AdminLogin = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("/api/v1/auth/admin/login", {
+
+      //  Try admin login
+      let response = await axios.post("/api/v1/auth/admin/login", {
         username,
         password,
       });
 
+      //  If admin fails → try student
       if (!response.data.success) {
-        alert(response.data.message);
-        return;
+
+        response = await axios.post("/api/v1/auth/admin/student/login", {
+          username,
+          password,
+        });
+
+        if (!response.data.success) {
+          alert(response.data.message);
+          return;
+        }
       }
 
-      const token = response.data.data;
-      login(token, "ADMIN");
-      navigate("/admin");
+      //  Extract
+      const { token, role } = response.data.data;
+
+      // Save
+      login(token, role);
+
+      // Redirect
+      if (role === "ADMIN") {
+        navigate("/admin");
+      } else {
+        navigate("/student");
+      }
 
     } catch (error) {
       console.error(error);
-      alert("Login failed");
+      alert("Login failed (server error)");
     }
   };
 
