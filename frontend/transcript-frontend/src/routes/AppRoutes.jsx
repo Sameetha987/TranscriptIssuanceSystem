@@ -17,7 +17,7 @@ import StudentLayout from "../layouts/StudentLayout";
 import StudentProfile from "../features/student/StudentProfile";
 import PublicVerify from "../features/verifier/PublicVerify";
 import PublicLanding from "../features/verifier/PublicLanding";
-
+import ChangePassword from "../features/student/ChangePassword";
 const AppRoutes = () => {
   return (
     <BrowserRouter>
@@ -59,6 +59,7 @@ const AppRoutes = () => {
           <Route path="transcripts" element={<MyTranscripts />} />
           <Route path="transcripts/:id" element={<StudentTranscriptDetail />} />
           <Route path="profile" element={<StudentProfile />} />
+          <Route path="change-password" element={<ChangePassword />} />
         </Route>
 
         {/* FALLBACK */}

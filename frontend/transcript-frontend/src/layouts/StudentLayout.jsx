@@ -1,7 +1,7 @@
-import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
+import { Link, Outlet, useNavigate, useLocation} from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../store/AuthContext";
-
+import { Key } from "lucide-react";
 import {
   LayoutDashboard,
   FileText,
@@ -36,6 +36,11 @@ const StudentLayout = () => {
       name: "Profile",
       path: "/student/profile",
       icon: <User size={18} />
+    },
+    {
+      name: "Change Password",
+      path: "/student/change-password",
+      icon: <Key size={18} />
     }
   ];
 
@@ -74,7 +79,7 @@ const StudentLayout = () => {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all hover:translate-x-1
                   ${
                     isActive
                       ? "bg-indigo-600 text-white shadow-md"
