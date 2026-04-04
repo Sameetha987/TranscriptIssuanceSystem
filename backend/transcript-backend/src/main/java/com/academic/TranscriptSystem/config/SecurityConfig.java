@@ -37,6 +37,7 @@ public class SecurityConfig {
 
                         // ROLE BASED
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/student/**").hasRole("STUDENT")
                         .requestMatchers("/api/v1/transcripts/my").hasRole("STUDENT")
                         .requestMatchers("/api/v1/transcripts/**").hasRole("ADMIN")
 

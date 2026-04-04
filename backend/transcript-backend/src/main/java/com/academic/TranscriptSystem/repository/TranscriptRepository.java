@@ -40,4 +40,5 @@ public interface TranscriptRepository extends JpaRepository<Transcript, Long> {
     );
     List<Transcript> findByStudent_EmailAndActiveTrue(String email);
     long countByVerificationStatus(String status);
+    List<Transcript> findByStudentId(Long studentId);
 }

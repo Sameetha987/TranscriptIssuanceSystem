@@ -1,5 +1,6 @@
 package com.academic.TranscriptSystem.controller;
 
+import com.academic.TranscriptSystem.dto.AuthResponseDTO;
 import com.academic.TranscriptSystem.dto.LoginRequestDTO;
 import com.academic.TranscriptSystem.entity.Admin;
 import com.academic.TranscriptSystem.repository.AdminRepository;
@@ -37,7 +38,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ApiResponse<String> login(@Valid @RequestBody LoginRequestDTO request) {
+    public ApiResponse<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
 
         Admin admin = adminRepository.findByUsername(request.getUsername())
                 .orElse(null);
@@ -58,11 +59,14 @@ public class AuthController {
             return new ApiResponse<>(false, "Invalid password", null);
         }
         String token = jwtUtil.generateToken(admin.getUsername(), "ADMIN");
-        return new ApiResponse<>(true, "Login successful", token);
+        AuthResponseDTO response =
+                new AuthResponseDTO(token, "ADMIN");
+
+        return new ApiResponse<>(true, "Login successful", response);
     }
 
     @PostMapping("/student/login")
-    public ApiResponse<String> studentLogin(@Valid @RequestBody LoginRequestDTO request) {
+    public ApiResponse<AuthResponseDTO> studentLogin(@Valid @RequestBody LoginRequestDTO request) {
 
         Student student = studentRepository.findByEmail(request.getUsername())
                 .orElse(null);
@@ -81,8 +85,10 @@ public class AuthController {
         }
 
         String token = jwtUtil.generateToken(student.getEmail(), "STUDENT");
+        AuthResponseDTO response =
+                new AuthResponseDTO(token, "STUDENT");
 
-        return new ApiResponse<>(true, "Student login successful", token);
+        return new ApiResponse<>(true, "Student login successful", response);
     }
 
 }
