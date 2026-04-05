@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import com.academic.TranscriptSystem.dto.PasswordResetDTO;
 
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class AdminStudentController {
     private final StudentRepository studentRepository;
     private final PasswordEncoder passwordEncoder;
     private final ActivityLogService activityLogService;
+
     public AdminStudentController(StudentRepository studentRepository,
                                   PasswordEncoder passwordEncoder, ActivityLogService activityLogService) {
         this.studentRepository = studentRepository;
@@ -105,5 +107,18 @@ public class AdminStudentController {
         dto.setTranscripts(transcriptDTOs);
 
         return new ApiResponse<>(true, "Student fetched", dto);
+    }
+    @PutMapping("/{id}/reset-password")
+    public ApiResponse<String> resetPassword(
+            @PathVariable Long id,
+            @RequestBody PasswordResetDTO dto) {
+
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
+
+        student.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        studentRepository.save(student);
+
+        return new ApiResponse<>(true, "Password reset successful", null);
     }
 }
