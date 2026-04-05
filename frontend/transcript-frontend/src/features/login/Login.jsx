@@ -4,7 +4,7 @@ import { ShieldCheck } from "lucide-react";
 import axios from "../../api/axios";
 import { AuthContext } from "../../store/AuthContext";
 import { useNotification } from "../../components/notifications/NotificationContext";
-const AdminLogin = () => {
+const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useContext(AuthContext);
@@ -29,7 +29,7 @@ const AdminLogin = () => {
         });
 
         if (!response.data.success) {
-          showNotification("success", response.data.message);
+          showNotification("error", response.data.message);
           return;
         }
       }
@@ -117,9 +117,17 @@ const AdminLogin = () => {
         {/* LOGIN CARD */}
         <div className="relative z-10 w-full max-w-md p-10 rounded-3xl bg-white/70 backdrop-blur-xl border border-white/40 shadow-2xl">
 
-          <h2 className="text-2xl font-semibold text-slate-800 mb-8 text-center">
-            Admin Login
-          </h2>
+          <div className="text-center mb-6 space-y-1">
+
+            <h2 className="text-3xl font-bold text-slate-800 tracking-tight">
+              Secure Login
+            </h2>
+
+            <p className="text-sm text-slate-500">
+              Sign in to access your transcripts and records
+            </p>
+
+          </div>
 
           <div className="space-y-6">
 
@@ -149,7 +157,7 @@ const AdminLogin = () => {
               onClick={handleLogin}
               className="w-full bg-gradient-to-r from-[#3730a3] to-[#312e81] hover:scale-[1.02] active:scale-[0.98] transition text-white p-3 rounded-xl font-medium shadow-lg"
             >
-              Sign In
+              Continue
             </button>
 
           </div>
@@ -160,4 +168,4 @@ const AdminLogin = () => {
   );
 };
 
-export default AdminLogin;
+export default Login;

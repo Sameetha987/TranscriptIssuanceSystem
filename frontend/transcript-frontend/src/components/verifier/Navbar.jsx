@@ -40,7 +40,7 @@ const Navbar = () => {
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition"
           >
             <LogIn size={16} />
-            Admin Login
+            Access Portal
           </button>
 
         </div>

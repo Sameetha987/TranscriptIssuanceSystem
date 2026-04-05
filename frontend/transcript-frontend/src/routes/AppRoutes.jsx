@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import AdminLogin from "../features/admin/AdminLogin";
+import Login from "../features/login/Login";
 import ProtectedRoute from "../components/admin/ProtectedRoute";
 import AdminLayout from "../layouts/AdminLayout";
 import AdminTranscripts from "../features/admin/AdminTranscripts";
@@ -26,7 +26,7 @@ const AppRoutes = () => {
         {/* PUBLIC ROUTES */}
         <Route path="/" element={<PublicLanding />} />
         <Route path="/verify" element={<PublicVerify />} />
-        <Route path="/login" element={<AdminLogin />} />
+        <Route path="/login" element={<Login />} />
 
         {/* ADMIN ROUTES */}
         <Route

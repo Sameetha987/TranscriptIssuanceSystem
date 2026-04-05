@@ -1,6 +1,8 @@
 import { Link, Outlet, useNavigate, useLocation} from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../store/AuthContext";
+import { useEffect, useState } from "react";
+import axios from "../api/axios";
 import { Key } from "lucide-react";
 import {
   LayoutDashboard,
@@ -15,6 +17,20 @@ const StudentLayout = () => {
   const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await axios.get("/api/v1/student/profile");
+        setUser(res.data.data);
+      } catch (err) {
+        console.error("Failed to fetch user");
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -122,8 +138,14 @@ const StudentLayout = () => {
 
           <div className="flex items-center gap-3">
 
-            <div className="bg-white px-4 py-2 rounded-xl shadow border text-sm text-slate-600">
-              🎓 Welcome Student
+            <div className=" bg-white px-4 py-2 rounded-xl shadow border text-md text-slate-800 flex items-center gap-2">
+
+              <GraduationCap size={20} className="text-indigo-500" />
+
+              <span>
+                Welcome {user?.name || "Student"}
+              </span>
+
             </div>
 
           </div>
