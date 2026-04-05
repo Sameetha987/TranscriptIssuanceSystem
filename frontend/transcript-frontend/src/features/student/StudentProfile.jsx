@@ -72,7 +72,7 @@ const StudentProfile = () => {
       </div>
 
       {/* PROFILE CARD */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl p-6 shadow-md p-6 hover:shadow-lg transition">
+      <div className="bg-gradient-to-r from-blue-900 to-slate-900 text-white bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl p-6 shadow-md p-6 hover:shadow-lg transition">
 
         <h2 className="text-2xl font-bold">
           {profile.name}

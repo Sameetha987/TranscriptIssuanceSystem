@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "../../api/axios";
-import toast from "react-hot-toast";
+import { useNotification } from "../../components/notifications/NotificationContext";
 
 const AdminCreateStudent = () => {
 
@@ -11,6 +11,7 @@ const AdminCreateStudent = () => {
     department: "",
     password: ""
   });
+  const { showNotification } = useNotification();
 
   const handleChange = (e) => {
     setForm({
@@ -29,7 +30,7 @@ const AdminCreateStudent = () => {
       );
 
       if (res.data.success) {
-        toast.success("Student created successfully");
+        showNotification("success","Student created successfully");
         setForm({
           studentRoll: "",
           name: "",
@@ -38,11 +39,11 @@ const AdminCreateStudent = () => {
           password: ""
         });
       } else {
-        toast.error(res.data.message);
+        showNotification("error",res.data.message);
       }
 
     } catch (err) {
-      toast.error("Failed to create student");
+      showNotification("error","Failed to create student");
     }
   };
 

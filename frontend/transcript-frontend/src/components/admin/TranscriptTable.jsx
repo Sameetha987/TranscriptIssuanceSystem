@@ -1,5 +1,7 @@
 import TranscriptRow from "./TranscriptRow";
 import { ArrowUpDown } from "lucide-react";
+import {useState} from "react";
+
 const TranscriptTable = ({
   transcripts,
   verificationMap,
@@ -11,6 +13,7 @@ const TranscriptTable = ({
   openMenuId,
   setOpenMenuId
 }) => {
+    const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
 
   return (
     <div className="bg-white rounded-2xl shadow-lg border overflow-hidden">
@@ -64,6 +67,8 @@ const TranscriptTable = ({
               setDeleteId={setDeleteId}
               openMenuId={openMenuId}
               setOpenMenuId={setOpenMenuId}
+              menuPosition={menuPosition}
+              setMenuPosition={setMenuPosition}
             />
           ))}
         </tbody>

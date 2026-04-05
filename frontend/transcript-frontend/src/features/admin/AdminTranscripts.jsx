@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "../../api/axios";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
+import { useNotification } from "../../components/notifications/NotificationContext";
 
 import Pagination from "../../components/admin/Pagination";
 import TranscriptSearchBar from "../../components/admin/TranscriptSearchBar";
@@ -28,6 +28,7 @@ const AdminTranscripts = () => {
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState("asc");
   const [openMenuId, setOpenMenuId] = useState(null);
+  const { showNotification } = useNotification();
   useEffect(() => {
     const handleClickOutside = () => {
       setOpenMenuId(null);
@@ -55,7 +56,15 @@ const AdminTranscripts = () => {
 
       setLoading(true);
 
-      let url = `/api/v1/transcripts?page=${currentPage - 1}&size=5`;
+      const fieldMap = {
+        roll: "studentRoll",
+        name: "studentName",
+        cgpa: "cgpa"
+      };
+
+      const backendField = fieldMap[sortField] || "id";
+
+      let url = `/api/v1/transcripts?page=${currentPage - 1}&size=5&sort=${backendField},${sortDirection}`;
 
       if (search.trim() !== "") {
         url += `&search=${search}`;
@@ -89,7 +98,7 @@ const AdminTranscripts = () => {
 
   useEffect(() => {
     fetchTranscripts();
-  }, [currentPage, search, filterStatus]);
+  }, [currentPage, search, filterStatus, sortField, sortDirection]);
 
   /*
   Filter Status
@@ -163,10 +172,10 @@ const AdminTranscripts = () => {
        )
      );
 
-     toast.success("Verification updated");
+     showNotification("success","Verification updated");
 
    } catch {
-     toast.error("Verification failed");
+     showNotification("error","Verification failed");
    } finally {
      setVerifyingId(null);
    }
@@ -182,13 +191,13 @@ const AdminTranscripts = () => {
 
       await axios.delete(`/api/v1/transcripts/${id}`);
 
-      toast.success("Transcript archived successfully");
+      showNotification("success","Transcript archived successfully");
 
       setTranscripts(prev => prev.filter(t => t.id !== id));
 
     } catch {
 
-      toast.error("Delete failed");
+      showNotification("error","Delete failed");
 
     }
 
@@ -202,26 +211,7 @@ const AdminTranscripts = () => {
 
     setSortField(field);
     setSortDirection(direction);
-
-    const sorted = [...transcripts].sort((a, b) => {
-
-      let valA = a[field];
-      let valB = b[field];
-
-      if (field === "roll") {
-        valA = a.student?.studentRoll;
-        valB = b.student?.studentRoll;
-      }
-
-      if (direction === "asc") {
-        return valA > valB ? 1 : -1;
-      } else {
-        return valA < valB ? 1 : -1;
-      }
-
-    });
-
-    setTranscripts(sorted);
+    setCurrentPage(1);
   };
 
   /*

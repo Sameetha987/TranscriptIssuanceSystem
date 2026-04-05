@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "../../api/axios";
-import toast from "react-hot-toast";
+import { useNotification } from "../../components/notifications/NotificationContext";
 
 const gradePointsMap = {
   O: 10,
@@ -36,7 +36,7 @@ const IssueTranscript = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
-
+  const { showNotification } = useNotification();
   const [subjects, setSubjects] = useState([
     { code: "", name: "", credits: "", marks: "", grade: "O" }
   ]);
@@ -93,7 +93,7 @@ const IssueTranscript = () => {
      );
 
      if (duplicate) {
-       toast.error("Subject code must be unique");
+       showNotification("error","Subject code must be unique");
        return;
      }
    }
@@ -141,16 +141,16 @@ const IssueTranscript = () => {
         subjects
       };
       if (!form.studentRoll) {
-          toast.error("Please select a student");
+          showNotification("error","Please select a student");
           return;
       }
       const response = await axios.post("/api/v1/transcripts/issue", payload);
 
       setResult(response.data.data);
-      toast.success("Transcript issued successfully");
+      showNotification("success","Transcript issued successfully");
 
     } catch (error) {
-      toast.error("Failed to issue transcript");
+      showNotification("error","Failed to issue transcript");
     } finally {
       setLoading(false);
     }

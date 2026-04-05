@@ -1,4 +1,5 @@
 import StatusBadge from "./StatusBadge";
+
 import { FileDown, RefreshCcw, Eye, Trash2, MoreVertical} from "lucide-react";
 
 const TranscriptRow = ({
@@ -9,10 +10,13 @@ const TranscriptRow = ({
   navigate,
   setDeleteId,
   openMenuId,
-  setOpenMenuId
+  setOpenMenuId,
+  menuPosition,
+  setMenuPosition
 }) => {
   const status =
     verificationMap[t.id] || t.verificationStatus || "PENDING";
+
   return (
     <tr className="border-t hover:bg-slate-50 transition cursor-pointer">
 
@@ -61,16 +65,29 @@ const TranscriptRow = ({
           <div className="relative" onClick={(e) => e.stopPropagation()}>
 
             <button
-              onClick={() =>
-                setOpenMenuId(openMenuId === t.id ? null : t.id)
-              }
+              onClick={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+
+                setMenuPosition({
+                  x: rect.right,
+                  y: rect.bottom
+                });
+
+                setOpenMenuId(openMenuId === t.id ? null : t.id);
+              }}
               className="p-2 rounded-lg hover:bg-slate-100 "
             >
               <MoreVertical size={18} />
             </button>
 
             {openMenuId === t.id && (
-              <div className="absolute right-0 mt-2 w-44 bg-white shadow-lg border rounded-lg z-50 animate-in fade-in zoom-in-95">
+              <div
+                className="fixed w-44 bg-white shadow-2xl border rounded-xl z-[9999] animate-in fade-in zoom-in-95"
+                style={{
+                  top: menuPosition.y + 6,
+                  left: menuPosition.x - 180
+                }}
+              >
                 <button
                   onClick={() => {
                     downloadPdf(t.id);

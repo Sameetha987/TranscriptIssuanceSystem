@@ -102,7 +102,7 @@ const StudentTranscriptDetail = () => {
       </div>
 
       {/* STUDENT INFO */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl p-6 shadow-md hover:shadow-lg transition">
+      <div className="bg-gradient-to-r from-blue-900 to-slate-900 text-white rounded-2xl p-6 shadow-md hover:shadow-lg transition">
 
         <h2 className="text-xl font-bold">
           {transcript.studentName}
