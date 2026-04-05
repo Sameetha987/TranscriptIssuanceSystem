@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "../../api/axios";
 import { useNavigate } from "react-router-dom";
-import { ArrowUpDown, Eye, MoreVertical, Key, Trash2 } from "lucide-react";
+import { ArrowUpDown, Eye, MoreVertical, Key, Trash2, Archive } from "lucide-react";
 import Pagination from "../../components/admin/Pagination";
 import { useNotification } from "../../components/notifications/NotificationContext";
 
@@ -28,6 +28,8 @@ const AdminStudentList = () => {
   const [resetStudentId, setResetStudentId] = useState(null);
   const [newPassword, setNewPassword] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
+  const [archiveId, setArchiveId] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
 
   const fetchStudents = async () => {
     try {
@@ -38,7 +40,7 @@ const AdminStudentList = () => {
         name: "name"
       };
 
-      const backendField = fieldMap[sortField] || "id";
+      const backendField = fieldMap[sortField] || "studentRoll";
 
       const res = await axios.get(
         `/api/v1/admin/students?page=${currentPage - 1}&size=5&sort=${backendField},${sortDirection}`
@@ -84,6 +86,33 @@ const AdminStudentList = () => {
       showNotification("error","Failed to reset password");
     } finally {
       setResetLoading(false);
+    }
+  };
+
+  const handleArchive = async (id) => {
+    try {
+      await axios.put(`/api/v1/admin/students/${id}/archive`);
+
+      showNotification("success","Student archived successfully");
+      setArchiveId(null);
+      fetchStudents();
+
+    } catch {
+      showNotification("error","Failed to archive student");
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`/api/v1/admin/students/${deleteId}`);
+
+      showNotification("success","Student deleted successfully");
+
+      setDeleteId(null);
+      fetchStudents(); // refresh list
+
+    } catch (err) {
+      showNotification("error","Failed to delete student");
     }
   };
 
@@ -224,8 +253,21 @@ const AdminStudentList = () => {
                               <Key size={16} />
                               Reset Password
                             </button>
-
                             <button
+                              onClick={() => {
+                                setArchiveId(s.id);
+                                setOpenMenuId(null);
+                              }}
+                              className="flex items-center gap-2 w-full px-4 py-2 text-sm hover:bg-slate-100"
+                            >
+                              <Archive size={16} />
+                              Archive
+                            </button>
+                            <button
+                              onClick={() => {
+                                setDeleteId(s.id);
+                                setOpenMenuId(null);
+                              }}
                               className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                             >
                               <Trash2 size={16} />
@@ -282,6 +324,76 @@ const AdminStudentList = () => {
                 className="px-4 py-2 rounded-lg bg-indigo-600 text-white"
               >
                 {resetLoading ? "Resetting..." : "Reset Password"}
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+      )}
+      {archiveId && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+          <div className="bg-white p-6 rounded-xl shadow-lg w-96">
+
+            <h3 className="text-lg font-semibold mb-3">
+              Archive Student
+            </h3>
+
+            <p className="text-slate-600 mb-5">
+              This student will be hidden from active list.
+            </p>
+
+            <div className="flex justify-end gap-3">
+
+              <button
+                onClick={() => setArchiveId(null)}
+                className="px-4 py-2 bg-slate-200 rounded-lg"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => handleArchive(archiveId)}
+                className="px-4 py-2 bg-yellow-600 text-white rounded-lg"
+              >
+                Archive
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+      )}
+      {deleteId && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+          <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md">
+
+            <h2 className="text-xl font-bold mb-3 text-red-600">
+              Delete Student
+            </h2>
+
+            <p className="text-slate-600 mb-6">
+              This action cannot be undone. Are you sure?
+            </p>
+
+            <div className="flex justify-end gap-3">
+
+              <button
+                onClick={() => setDeleteId(null)}
+                className="px-4 py-2 rounded-lg bg-slate-200"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleDelete}
+                className="px-4 py-2 rounded-lg bg-red-600 text-white"
+              >
+                Delete
               </button>
 
             </div>
