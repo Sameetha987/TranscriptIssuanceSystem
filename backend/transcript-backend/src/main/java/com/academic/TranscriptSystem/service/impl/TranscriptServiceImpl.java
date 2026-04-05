@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -129,22 +130,29 @@ public class TranscriptServiceImpl implements TranscriptService {
     }
 
     @Override
-    public Page<Transcript> searchTranscripts(String search, int page, int size, String status) {
+    public Page<Transcript> searchTranscripts(String search, int page, int size,  String status) {
 
         Pageable pageable = PageRequest.of(page, size);
 
         return transcriptRepository.searchTranscripts(search, pageable);
     }
-    @Override
-    public Page<Transcript> getTranscripts(int page, int size, String search, String status) {
+    public Page<Transcript> getTranscripts(
+            int page,
+            int size,
+            String sortField,
+            Sort.Direction direction,
+            String search,
+            String status
+    ) {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        if (search != null && !search.isEmpty()) {
-            return transcriptRepository.searchTranscripts(search, pageable);
-        }
-
-        return transcriptRepository.findByActiveTrue(pageable);
+        return transcriptRepository.findAllWithStudentSorting(
+                sortField,
+                direction.name().toLowerCase(),
+                search,
+                pageable
+        );
     }
 
     // GET BY STUDENT EMAIL

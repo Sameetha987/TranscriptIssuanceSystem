@@ -33,6 +33,24 @@ public interface TranscriptRepository extends JpaRepository<Transcript, Long> {
             @Param("search") String search,
             Pageable pageable
     );
+    @Query("""
+    SELECT t FROM Transcript t
+    JOIN t.student s
+    WHERE (:search IS NULL OR s.name LIKE %:search%)
+    ORDER BY 
+      CASE WHEN :sortField = 'studentRoll' AND :direction = 'asc' THEN s.studentRoll END ASC,
+      CASE WHEN :sortField = 'studentRoll' AND :direction = 'desc' THEN s.studentRoll END DESC,
+      CASE WHEN :sortField = 'studentName' AND :direction = 'asc' THEN s.name END ASC,
+      CASE WHEN :sortField = 'studentName' AND :direction = 'desc' THEN s.name END DESC,
+      CASE WHEN :sortField = 'cgpa' AND :direction = 'asc' THEN t.cgpa END ASC,
+      CASE WHEN :sortField = 'cgpa' AND :direction = 'desc' THEN t.cgpa END DESC
+""")
+    Page<Transcript> findAllWithStudentSorting(
+            @Param("sortField") String sortField,
+            @Param("direction") String direction,
+            @Param("search") String search,
+            Pageable pageable
+    );
 
     boolean existsByStudent_StudentRollAndSemesterAndActiveTrue(
             String studentRoll,

@@ -9,6 +9,9 @@ import com.academic.TranscriptSystem.repository.StudentRepository;
 import com.academic.TranscriptSystem.response.ApiResponse;
 import com.academic.TranscriptSystem.service.ActivityLogService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,13 +61,23 @@ public class AdminStudentController {
 
         return new ApiResponse<>(true, "Student created successfully", saved);
     }
-    @GetMapping("/all")
-    public ApiResponse<List<Student>> getAllStudents() {
-        return new ApiResponse<>(
-                true,
-                "Students fetched",
-                studentRepository.findAll()
+
+    @GetMapping
+    public Page<Student> getStudents(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id,asc") String sort) {
+
+        String[] sortParams = sort.split(",");
+        Sort.Direction direction = Sort.Direction.fromString(sortParams[1]);
+
+        PageRequest pageable = PageRequest.of(
+                page,
+                size,
+                Sort.by(direction, sortParams[0])
         );
+
+        return studentRepository.findAll(pageable);
     }
     @GetMapping("/{id}")
     public ApiResponse<StudentProfileDTO> getStudentById(@PathVariable Long id) {

@@ -40,8 +40,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/student/**").hasRole("STUDENT")
                         .requestMatchers("/api/v1/transcripts/my").hasRole("STUDENT")
                         .requestMatchers("/api/v1/transcripts/student/**").hasRole("STUDENT")
-                        .requestMatchers("/api/v1/subjects/**").hasRole("STUDENT")
                         .requestMatchers("/api/v1/transcripts/verify/**").hasAnyRole("ADMIN", "STUDENT")
+                        .requestMatchers("/api/v1/subjects/**").hasAnyRole("ADMIN","STUDENT")
                         .requestMatchers("/api/v1/transcripts/**").hasRole("ADMIN")
 
                         // fallback
