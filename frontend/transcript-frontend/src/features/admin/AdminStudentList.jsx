@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "../../api/axios";
 import { useNavigate } from "react-router-dom";
-import { ArrowUpDown, Eye, MoreVertical, Edit, Trash2 } from "lucide-react";
+import { ArrowUpDown, Eye, MoreVertical, Key, Trash2 } from "lucide-react";
 import Pagination from "../../components/admin/Pagination";
+import { useNotification } from "../../components/notifications/NotificationContext";
 
 const AdminStudentList = () => {
 
@@ -11,7 +12,7 @@ const AdminStudentList = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-
+  const { showNotification } = useNotification();
   const [openMenuId, setOpenMenuId] = useState(null);
   const fieldMap = {
     roll: "studentRoll",
@@ -23,6 +24,10 @@ const AdminStudentList = () => {
 
   const navigate = useNavigate();
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
+
+  const [resetStudentId, setResetStudentId] = useState(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
 
   const fetchStudents = async () => {
     try {
@@ -58,6 +63,29 @@ const AdminStudentList = () => {
     window.addEventListener("click", close);
     return () => window.removeEventListener("click", close);
   }, []);
+
+  const handleResetPassword = async () => {
+    try {
+      setResetLoading(true);
+
+      await axios.put(
+        `/api/v1/admin/students/${resetStudentId}/reset-password`,
+        {
+          newPassword
+        }
+      );
+
+      showNotification("success","Password reset successfully");
+
+      setResetStudentId(null);
+      setNewPassword("");
+
+    } catch (err) {
+      showNotification("error","Failed to reset password");
+    } finally {
+      setResetLoading(false);
+    }
+  };
 
   const handleSort = (field) => {
 
@@ -188,13 +216,13 @@ const AdminStudentList = () => {
                           >
                             <button
                               onClick={() => {
-                                navigate(`/admin/students/edit/${s.id}`);
+                                setResetStudentId(s.id);
                                 setOpenMenuId(null);
                               }}
                               className="flex items-center gap-2 w-full px-4 py-2 text-sm hover:bg-slate-100"
                             >
-                              <Edit size={16} />
-                              Edit
+                              <Key size={16} />
+                              Reset Password
                             </button>
 
                             <button
@@ -222,6 +250,46 @@ const AdminStudentList = () => {
         </div>
 
       </div>
+      {resetStudentId && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+
+          <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md">
+
+            <h2 className="text-xl font-bold mb-4">
+              Reset Student Password
+            </h2>
+
+            <input
+              type="password"
+              placeholder="Enter new password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="w-full px-4 py-3 border rounded-lg mb-4"
+            />
+
+            <div className="flex justify-end gap-3">
+
+              <button
+                onClick={() => setResetStudentId(null)}
+                className="px-4 py-2 rounded-lg bg-slate-200"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleResetPassword}
+                disabled={resetLoading}
+                className="px-4 py-2 rounded-lg bg-indigo-600 text-white"
+              >
+                {resetLoading ? "Resetting..." : "Reset Password"}
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+      )}
 
       <Pagination
         currentPage={currentPage}
