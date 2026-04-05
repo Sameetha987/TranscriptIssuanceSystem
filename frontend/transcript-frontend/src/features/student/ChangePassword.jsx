@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "../../api/axios";
 import { Lock } from "lucide-react";
+import { useNotification } from "../../components/notifications/NotificationContext";
 
 const ChangePassword = () => {
 
@@ -9,6 +10,7 @@ const ChangePassword = () => {
     newPassword: "",
     confirmPassword: ""
   });
+  const { showNotification } = useNotification();
 
   const [loading, setLoading] = useState(false);
 
@@ -19,7 +21,7 @@ const ChangePassword = () => {
   const handleSubmit = async () => {
 
     if (form.newPassword !== form.confirmPassword) {
-      alert("Passwords do not match");
+      showNotification("error", "Passwords do not match");
       return;
     }
 
@@ -31,7 +33,7 @@ const ChangePassword = () => {
         newPassword: form.newPassword
       });
 
-      alert(res.data.message);
+      showNotification("success", res.data.message);
 
       setForm({
         currentPassword: "",

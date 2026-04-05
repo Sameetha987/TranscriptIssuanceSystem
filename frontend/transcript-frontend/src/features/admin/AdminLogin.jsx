@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 import axios from "../../api/axios";
 import { AuthContext } from "../../store/AuthContext";
-
+import { useNotification } from "../../components/notifications/NotificationContext";
 const AdminLogin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
 
   const handleLogin = async () => {
     try {
@@ -28,7 +29,7 @@ const AdminLogin = () => {
         });
 
         if (!response.data.success) {
-          alert(response.data.message);
+          showNotification("success", response.data.message);
           return;
         }
       }
@@ -48,7 +49,7 @@ const AdminLogin = () => {
 
     } catch (error) {
       console.error(error);
-      alert("Login failed (server error)");
+      showNotification("error","Login Failed");
     }
   };
 

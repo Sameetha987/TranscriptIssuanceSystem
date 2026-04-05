@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "../../api/axios";
 import { motion } from "framer-motion";
-import CgpaChart from "../../components/student/CgpaChart";
+import CgpaAnalytics from "../../components/student/CgpaAnalytics";
 import {
   FileText,
   ShieldCheck,
@@ -150,7 +150,7 @@ const StudentDashboard = () => {
         </div>
 
       </div>
-
+      <CgpaAnalytics />
       {/* RECENT TRANSCRIPTS */}
       <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl p-6 shadow-md p-6 hover:shadow-lg transition">
 
@@ -198,7 +198,6 @@ const StudentDashboard = () => {
         )}
 
       </div>
-      <CgpaChart transcripts={transcripts} />
 
     </motion.div>
   );

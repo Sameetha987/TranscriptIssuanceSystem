@@ -1,13 +1,17 @@
 import AppRoutes from './routes/AppRoutes';
-import { Toaster } from 'react-hot-toast';
+import { NotificationProvider } from "./components/notifications/NotificationContext";
 
 function App() {
   return (
     <>
-      <Toaster position="top-right" />
-      <AppRoutes />
+      <NotificationProvider>
+         <AppRoutes />
+      </NotificationProvider>
     </>
   );
 }
 
 export default App;
+
+
+

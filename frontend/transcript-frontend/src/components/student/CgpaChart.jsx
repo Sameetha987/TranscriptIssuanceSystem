@@ -10,7 +10,7 @@ import {
 
 const CgpaChart = ({ transcripts }) => {
 
-  // 🔥 Transform data
+  //  Transform data
   const data = transcripts.map(t => ({
     semester: `Sem ${t.semester}`,
     cgpa: t.cgpa
