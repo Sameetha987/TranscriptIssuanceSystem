@@ -79,7 +79,7 @@ public class AdminStudentController {
                 Sort.by(direction, sortParams[0])
         );
 
-        return studentRepository.findAll(pageable);
+        return studentRepository.findByActiveTrue(pageable);
     }
     @GetMapping("/{id}")
     public ApiResponse<StudentProfileDTO> getStudentById(@PathVariable Long id) {
@@ -120,5 +120,49 @@ public class AdminStudentController {
         studentRepository.save(student);
 
         return new ApiResponse<>(true, "Password reset successful", null);
+    }
+    @PutMapping("/{id}/archive")
+    public ApiResponse<String> archiveStudent(@PathVariable Long id) {
+
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
+
+        student.setActive(false);
+        studentRepository.save(student);
+
+        activityLogService.log(
+                "ARCHIVE_STUDENT",
+                null,
+                "Archived student: " + student.getStudentRoll()
+        );
+
+        return new ApiResponse<>(true, "Student archived successfully", null);
+    }
+    @PutMapping("/{id}/unarchive")
+    public ApiResponse<String> unarchiveStudent(@PathVariable Long id) {
+
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
+
+        student.setActive(true);
+        studentRepository.save(student);
+
+        return new ApiResponse<>(true, "Student restored", null);
+    }
+    @DeleteMapping("/{id}")
+    public ApiResponse<String> deleteStudent(@PathVariable Long id) {
+
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
+
+        studentRepository.delete(student);
+
+        activityLogService.log(
+                "DELETE_STUDENT",
+                null,
+                "Deleted student: " + student.getStudentRoll()
+        );
+
+        return new ApiResponse<>(true, "Student deleted successfully", null);
     }
 }
