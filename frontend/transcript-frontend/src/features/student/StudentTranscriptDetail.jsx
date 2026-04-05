@@ -11,6 +11,7 @@ import {
   ExternalLink,
   ShieldCheck
 } from "lucide-react";
+import ShareTranscript from "../../components/student/ShareTranscript";
 
 const StudentTranscriptDetail = () => {
 
@@ -202,6 +203,7 @@ const StudentTranscriptDetail = () => {
         />
 
         <TranscriptQR id={transcript.id} />
+        <ShareTranscript id={id} />
 
       </div>
 

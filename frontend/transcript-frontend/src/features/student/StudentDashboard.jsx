@@ -13,7 +13,6 @@ const StudentDashboard = () => {
 
   const [student, setStudent] = useState(null);
   const [transcripts, setTranscripts] = useState([]);
-
   const [stats, setStats] = useState({
     total: 0,
     verified: 0,
@@ -21,9 +20,7 @@ const StudentDashboard = () => {
     cgpa: 0
   });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+
 
   const fetchData = async () => {
     try {
@@ -66,6 +63,10 @@ const StudentDashboard = () => {
       console.error("Failed to load student dashboard", err);
     }
   };
+  useEffect(() => {
+      fetchData();
+    }, []);
+
 
   return (
     <motion.div

@@ -16,15 +16,18 @@ const PublicVerify = () => {
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
   const [linkCopied, setLinkCopied] = useState(false);
-
+  const queryParams = new URLSearchParams(window.location.search);
+  const idFromUrl = queryParams.get("id");
   const { id } = useParams();
 
   useEffect(() => {
-    if (id) {
-      setInputId(id);
-      handleSearch(id);
+    if (idFromUrl) {
+      setInputId(idFromUrl);
+      setTimeout(() => {
+        handleSearch(idFromUrl);
+      }, 0);
     }
-  }, [id]);
+  }, [idFromUrl]);
 
   const handleSearch = async (customId) => {
 

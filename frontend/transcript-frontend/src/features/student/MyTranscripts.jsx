@@ -40,6 +40,7 @@ const MyTranscripts = () => {
     }
   };
 
+
   const applyFilters = () => {
     let list = [...transcripts];
 
