@@ -14,14 +14,18 @@ public class DataInitializer {
 
     @PostConstruct
     public void init() {
-        if (adminRepository.findByUsername("admin").isEmpty()) {
+        System.out.println(" INIT RUNNING");
+
+        if (adminRepository.findByUsername("admin") == null) {
             Admin admin = new Admin();
             admin.setUsername("admin");
-
-            admin.setPassword("$2a$10$zI1L8FE0HZZy6H5ISyLOdOvzrmB3Sq8nFiC.208Jz1Y6HGaVdXKBe");
+            admin.setPassword("$2a$10$7QJ5KzQ2K5Y5gXK8Z9YwOeWk3nQFhW2l7Y0k6GQvP2sR7k6Z8XJ2K");
 
             adminRepository.save(admin);
-            System.out.println("Admin inserted into DB");
+
+            System.out.println("ADMIN INSERTED");
+        } else {
+            System.out.println("️ ADMIN ALREADY EXISTS");
         }
     }
 }
