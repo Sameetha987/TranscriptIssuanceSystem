@@ -51,13 +51,13 @@ const IssueTranscript = () => {
   const fetchStudents = async () => {
     try {
       const res = await axios.get("/api/v1/admin/students");
-      setStudents(res.data.data);
+      setStudents(res.data.content);
     } catch (err) {
       console.error("Failed to fetch students");
     }
   };
 
-  const filteredStudents = students.filter((s) =>
+  const filteredStudents = (students || []).filter((s) =>
     s.studentRoll.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
