@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import com.academic.TranscriptSystem.dto.PasswordResetDTO;
@@ -63,7 +64,16 @@ public class AdminStudentController {
 
         return new ApiResponse<>(true, "Student created successfully", saved);
     }
+    @GetMapping("/admin/students/{roll}")
+    public ResponseEntity<?> getStudentByRoll(@PathVariable String roll) {
+        Student student = studentService.findByRoll(roll);
 
+        if (student == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(student);
+    }
     @GetMapping
     public Page<Student> getStudents(
             @RequestParam(defaultValue = "0") int page,
