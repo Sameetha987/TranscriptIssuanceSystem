@@ -10,6 +10,7 @@ import com.academic.TranscriptSystem.service.VerificationService;
 import com.academic.TranscriptSystem.util.QRCodeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,6 +18,8 @@ import java.time.LocalDateTime;
 @Service
 public class VerificationServiceImpl implements VerificationService {
 
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
     private final TranscriptRepository transcriptRepository;
     private final BlockchainService blockchainService;
     private final HashService hashService;
@@ -87,7 +90,7 @@ public class VerificationServiceImpl implements VerificationService {
 
         transcriptRepository.save(transcript);
         String verifyUrl =
-                "http://localhost:8080/api/v1/transcripts/public/verify/" + transcriptId;
+                frontendUrl + "/verify?id=" + transcriptId;
 
         String qrCodeBase64 =
                 QRCodeUtil.generateBase64QRCode(verifyUrl);
