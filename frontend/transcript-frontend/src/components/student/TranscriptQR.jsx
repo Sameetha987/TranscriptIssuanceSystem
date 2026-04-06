@@ -2,7 +2,7 @@ import { QRCodeCanvas } from "qrcode.react";
 
 const TranscriptQR = ({ id }) => {
 
-  const verifyUrl = `http://localhost:5174/verify?id=${id}`;
+  const verifyUrl = `${window.location.origin}/verify?id=${id}`;
 
   return (
     <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl shadow-md p-6 text-center hover:shadow-lg transition">
