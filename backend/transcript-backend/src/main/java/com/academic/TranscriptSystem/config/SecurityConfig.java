@@ -34,13 +34,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/transcripts/public/**").permitAll()
 
                         // ROLE BASED
-                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/student/**").hasRole("STUDENT")
-                        .requestMatchers("/api/v1/transcripts/my").hasRole("STUDENT")
-                        .requestMatchers("/api/v1/transcripts/student/**").hasRole("STUDENT")
-                        .requestMatchers("/api/v1/transcripts/verify/**").hasAnyRole("ADMIN", "STUDENT")
-                        .requestMatchers("/api/v1/subjects/**").hasAnyRole("ADMIN","STUDENT")
-                        .requestMatchers("/api/v1/transcripts/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/admin/**").hasRole("ROLE_ADMIN")
+                        .requestMatchers("/api/v1/student/**").hasRole("ROLE_STUDENT")
+                        .requestMatchers("/api/v1/transcripts/my").hasRole("ROLE_STUDENT")
+                        .requestMatchers("/api/v1/transcripts/student/**").hasRole("ROLE_STUDENT")
+                        .requestMatchers("/api/v1/transcripts/verify/**").hasAnyRole("ROLE_ADMIN", "ROLE_STUDENT")
+                        .requestMatchers("/api/v1/subjects/**").hasAnyRole("ROLE_ADMIN","ROLE_STUDENT")
+                        .requestMatchers("/api/v1/transcripts/**").hasRole("ROLE_ADMIN")
 
                         // fallback
                         .anyRequest().authenticated()
