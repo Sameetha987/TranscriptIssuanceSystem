@@ -34,13 +34,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/transcripts/public/**").permitAll()
 
                         // ROLE BASED
-                        .requestMatchers("/api/v1/admin/**").hasRole("ROLE_ADMIN")
-                        .requestMatchers("/api/v1/student/**").hasRole("ROLE_STUDENT")
-                        .requestMatchers("/api/v1/transcripts/my").hasRole("ROLE_STUDENT")
-                        .requestMatchers("/api/v1/transcripts/student/**").hasRole("ROLE_STUDENT")
-                        .requestMatchers("/api/v1/transcripts/verify/**").hasAnyRole("ROLE_ADMIN", "ROLE_STUDENT")
-                        .requestMatchers("/api/v1/subjects/**").hasAnyRole("ROLE_ADMIN","ROLE_STUDENT")
-                        .requestMatchers("/api/v1/transcripts/**").hasRole("ROLE_ADMIN")
+                        .requestMatchers("/api/v1/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/api/v1/student/**").hasAuthority("STUDENT")
+                        .requestMatchers("/api/v1/transcripts/my").hasAuthority("STUDENT")
+                        .requestMatchers("/api/v1/transcripts/student/**").hasAuthority("STUDENT")
+                        .requestMatchers("/api/v1/transcripts/verify/**").hasAnyAuthority("ADMIN", "STUDENT")
+                        .requestMatchers("/api/v1/subjects/**").hasAnyAuthority("ADMIN","STUDENT")
+                        .requestMatchers("/api/v1/transcripts/**").hasAuthority("ADMIN")
 
                         // fallback
                         .anyRequest().authenticated()
