@@ -4,7 +4,7 @@ import HeroSection from "../../components/verifier/HeroSection";
 import SearchBar from "../../components/verifier/SearchBar";
 import VerifyResultCard from "../../components/verifier/VerifyResultCard";
 import VerifySkeleton from "../../components/verifier/VerifySkeleton";
-import NavBar from "../../components/verifier/NavBar";
+import Navbar from "../../components/verifier/Navbar";
 import axios from "../../api/axios";
 import { useParams } from "react-router-dom";
 import { Share2 } from "lucide-react";
@@ -53,7 +53,7 @@ const PublicVerify = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-white to-slate-100 relative overflow-hidden">
 
-      <NavBar />
+      <Navbar />
 
       {/* HERO */}
       <div className="max-w-7xl mx-auto px-6 pt-24 pb-10">
