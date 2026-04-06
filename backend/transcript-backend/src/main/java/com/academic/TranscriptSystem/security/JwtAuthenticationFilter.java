@@ -24,9 +24,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getServletPath();
-        return path.startsWith("/api/v1/auth")
-                || path.startsWith("/api/v1/transcripts/public");
+        String path = request.getRequestURI();
+
+        return path.contains("/api/v1/auth")
+                || path.contains("/api/v1/transcripts/public");
     }
 
     @Override
@@ -35,6 +36,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+        if (shouldNotFilter(request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
